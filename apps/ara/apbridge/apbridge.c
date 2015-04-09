@@ -85,6 +85,14 @@ static int recv_from_unipro(unsigned int cportid, const void *buf, size_t len)
   return ret;
 }
 
+static void manifest_enable(unsigned char *manifest_file, int manifest_number)
+{
+  char mid[MID_LENGTH];
+
+  snprintf(mid, MID_LENGTH, "MID-%d", manifest_number + 1);
+  enable_manifest(mid, NULL);
+}
+
 static void manifest_event(unsigned char *manifest_file, int manifest_number)
 {
   char mid[MID_LENGTH];
@@ -102,8 +110,9 @@ static void *svc_sim_fn(void * p_data)
   usb_wait(priv);
   send_svc_handshake();
   send_ap_id(0);
-  foreach_manifest(manifest_event);
+  foreach_manifest(manifest_enable);
   enable_cports();
+  foreach_manifest(manifest_event);
 
   return NULL;
 }
