@@ -85,6 +85,20 @@ struct u16550_s
 #endif
 };
 
+
+/*
+* Serial input interrupt line counters -- external structure
+* Four lines can interrupt: CTS, DSR, RI, DCD
+*/
+//struct serial_icounter_struct {
+struct u16550_serial_state_s {
+	int dcd, dsr, brk, ri;
+	int frame_err, parity_err, overrun_err;
+};
+
+
+
+
 /****************************************************************************
  * Private Function Prototypes
  ****************************************************************************/
@@ -529,6 +543,38 @@ static inline void u16550_enablebreaks(struct u16550_s *priv, bool enable)
   u16550_serialout(priv, UART_LCR_OFFSET, lcr);
 }
 
+/****************************************************************************
+ * Name: u16550_setcontrolline
+ * 
+ * Descrption:
+ *   Control DTR and RTS line states of the UART
+ *
+ ****************************************************************************/
+
+static inline void u16550_setcontrolline(struct u16550_s *priv, int value)
+{
+  uint32_t lcr = u16550_serialin(priv, UART_MCR_OFFSET);
+  
+	if (value & TIOCM_RTS) {
+		lcr |= UART_MCR_RTS;
+	}
+	else
+	{
+		lcr &= ~UART_MCR_RTS;
+	}
+
+	if (value & TIOCM_DTR) {
+		lcr |= UART_MCR_DTR;
+	}
+	else
+	{
+		lcr &= ~UART_MCR_DTR;
+	}
+
+  u16550_serialout(priv, UART_MCR_OFFSET, lcr);
+}
+
+
 /************************************************************************************
  * Name: u16550_divisor
  *
@@ -731,6 +777,8 @@ static void u16550_detach(struct uart_dev_s *dev)
  *
  ****************************************************************************/
 
+struct u16550_serial_state_s g_u16550_serial_state;
+
 #ifndef CONFIG_SUPPRESS_SERIAL_INTS
 static int u16550_interrupt(int irq, void *context)
 {
@@ -823,6 +871,14 @@ static int u16550_interrupt(int irq, void *context)
 
               status = u16550_serialin(priv, UART_MSR_OFFSET);
               vdbg("MSR: %02x\n", status);
+              //BSQ serial_state
+              
+				if(status & UART_MSR_DSR)
+					g_u16550_serial_state.dsr = 1;
+				if(status & UART_MSR_RI)
+					g_u16550_serial_state.ri = 1;
+				if(status & UART_MSR_DCD)
+					g_u16550_serial_state.dcd = 1;					
               break;
             }
 
@@ -902,6 +958,21 @@ static int u16550_ioctl(struct file *filep, int cmd, unsigned long arg)
       }
       break;
 
+		
+    case TIOCMBIS:   /* Set modem bits: FAR const int */
+	//BSQ
+      {
+        u16550_setcontrolline(priv, (unsigned int) arg );
+      }
+      break;
+
+    case TIOCGSERIAL: /* Get serial line info: FAR struct serial_struct */
+    //BSQ
+    {
+		//return g_u16550_serial_state;
+	}
+		break;
+		
     default:
       set_errno(ENOTTY);
       ret = ERROR;

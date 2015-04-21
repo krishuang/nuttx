@@ -303,6 +303,18 @@
 #define UART_LSR_TEMT                (1 << 6)  /* Bit 6:  Transmitter Empty */
 #define UART_LSR_RXFE                (1 << 7)  /* Bit 7:  Error in RX FIFO (RXFE) */
 
+
+/* MCR Modem Status Register */ //BSQ
+#define UART_MSR_DTCS                 (1 << 0)  /* Bit 0:  Delta Clear to Send */
+#define UART_MSR_DDSR                 (1 << 1)  /* Bit 1:  Delta Data Set Ready */
+#define UART_MSR_TERI                 (1 << 2)  /* Bit 2:  Trailling Edge Ring Indicator */
+#define UART_MSR_DDCD                 (1 << 3)  /* Bit 3:  Delta Data Carrier Detect */
+#define UART_MSR_CTS                  (1 << 4)  /* Bit 4:  Clear to Send */
+#define UART_MSR_DSR                  (1 << 5)  /* Bit 5:  Data Set Ready */
+#define UART_MSR_RI                   (1 << 6)  /* Bit 6:  Ring Indicator */
+#define UART_MSR_DCD                  (1 << 7)  /* Bit 7:  Data Carrier Detect */
+
+
 /* SCR Scratch Pad Register */
 
 #define UART_SCR_MASK                (0xff)    /* Bits 0-7: SCR data */
