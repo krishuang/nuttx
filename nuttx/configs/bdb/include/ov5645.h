@@ -33,11 +33,6 @@
 
 #include <stdint.h>
 
-/* Touchscreen controller boot modes */
-#define LG4892_TS_BOOT_MODE_BOOTLOADER          0x11
-#define LG4892_TS_BOOT_MODE_APPLICATION         0x22
-#define LG4892_TS_BOOT_MODE_VERIFYING           0x33
-
 int ov5645_init(int mode);
 
 #endif
