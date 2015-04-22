@@ -12,4 +12,10 @@ config APB1
 	---help---
 		Select if you are building for APB1 on the BDB.
 
+config BOARD_HAVE_CAMERA
+	bool
+	default n
+	select GPIO
+	select I2C
+
 endif
