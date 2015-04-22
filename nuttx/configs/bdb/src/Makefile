@@ -7,6 +7,12 @@ AOBJS		= $(ASRCS:.S=$(OBJEXT))
 
 CSRCS		= up_boot.c
 
+ifeq ($(CONFIG_APB1),y)
+CSRCS   += csi_tx_init.c
+else
+CSRCS   += csi_rx_init.c ov5645.c
+endif
+
 ifeq ($(CONFIG_NX_LCDDRIVER),y)
 CSRCS		+= up_lcd.c
 endif
