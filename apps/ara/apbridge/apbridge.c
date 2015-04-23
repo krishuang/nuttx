@@ -36,7 +36,7 @@
 #include <nuttx/usb/apb_es1.h>
 #include <apps/greybus-utils/utils.h>
 
-#define MID_LENGTH 7
+#define IID_LENGTH 7
 
 static struct apbridge_dev_s *g_usbdev = NULL;
 static pthread_t g_svc_thread;
@@ -95,10 +95,10 @@ static void manifest_enable(unsigned char *manifest_file, int manifest_number)
 
 static void manifest_event(unsigned char *manifest_file, int manifest_number)
 {
-  char mid[MID_LENGTH];
+  char iid[IID_LENGTH];
 
-  snprintf(mid, MID_LENGTH, "MID-%d", manifest_number + 1);
-  send_svc_event(0, mid, manifest_file);
+  snprintf(iid, IID_LENGTH, "IID-%d", manifest_number + 1);
+  send_svc_event(0, iid, manifest_file);
 }
 
 static void *svc_sim_fn(void * p_data)
