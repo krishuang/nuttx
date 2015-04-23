@@ -172,6 +172,7 @@ struct apbridge_dev_s {
     struct usbdev_s *usbdev;    /* usbdev driver pointer */
 
     uint8_t config;             /* Configuration number */
+    sem_t config_sem;
 
     struct usbdev_ep_s *epintin;        /* Interrupt IN endpoint structure */
     struct usbdev_ep_s *epbulkin;       /* Bulk IN endpoint structure */
@@ -359,11 +360,7 @@ static const struct usb_qualdesc_s g_qualdesc = {
 
 void usb_wait(struct apbridge_dev_s *priv)
 {
-    volatile uint8_t *config;
-    config = &priv->config;
-
-    while (*config == APBRIDGE_CONFIGIDNONE)
-        usleep(100000);
+    sem_wait(&priv->config_sem);
 }
 
 /**
@@ -776,6 +773,7 @@ static int usbclass_setconfig(struct apbridge_dev_s *priv, uint8_t config)
     /* We are successfully configured */
 
     priv->config = config;
+    sem_post(&priv->config_sem);
 
     return OK;
 
@@ -1495,6 +1493,7 @@ int usbdev_apbinitialize(struct apbridge_usb_driver *driver)
 
     memset(priv, 0, sizeof(struct apbridge_dev_s));
     priv->driver = driver;
+    sem_init(&priv->config_sem, 0, 0);
 
     /* Initialize the USB class driver structure */
 
