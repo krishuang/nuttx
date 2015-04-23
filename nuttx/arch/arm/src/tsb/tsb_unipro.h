@@ -343,6 +343,8 @@
 #define TSB_MAILBOX                 (0xA000)
 #define TSB_MAXSEGMENTCONFIG        (0xD089)
 #define DME_POWERMODEIND            (0xD040)
+#define TSB_DEBUGTXBYTECOUNT        (0xD092)
+#define TSB_DEBUGRXBYTECOUNT        (0xD093)
 
 /* TODO: doesn't belong here */
 #ifndef ARRAY_SIZE
