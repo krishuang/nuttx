@@ -51,6 +51,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <unistd.h>
 #include <debug.h>
 #include <stdint.h>
 #include <nuttx/gpio.h>
@@ -401,6 +402,7 @@ int camera_i2c_read(struct i2c_dev_s *dev, uint16_t addr, uint8_t *data) {
 
     ret = I2C_TRANSFER(dev, msg, 2);
     if (ret != OK) {
+        printf("%s: read 0x%04x fail\n",__func__,addr);
         return -1;
     }
 
@@ -430,6 +432,7 @@ int camera_i2c_write(struct i2c_dev_s *dev, uint16_t addr, uint8_t data) {
 
     ret = I2C_TRANSFER(dev, msg, 1);
     if (ret != OK) {
+        printf("%s: write 0x%04x fail\n",__func__,addr);
         return -1;
     }
 
@@ -444,7 +447,7 @@ int ov5645_init(int mode) {
     struct i2c_dev_s *cam_i2c = NULL;
     struct camera_param *initialize_table;
     uint8_t id[2] = {0, 0};
-    int i = 0, count = 0, loop = 0;
+    int i = 0, count = 0;
 
     switch (mode) {
         case 0:
@@ -460,18 +463,14 @@ int ov5645_init(int mode) {
 
     /* sensor powerup */
     tsb_gpio_direction_out(OV5645_PWDN, 0);     // shutdown -> L
-    tsb_gpio_direction_out(OV5645_RESET, 0);    // Reset -> L
-
-    loop = 1000;
-    while(loop--);
-
-    tsb_gpio_direction_out(OV5645_RESET, 1);    // Reset -> H
-    loop = 1000;
-    while(loop--);
+    tsb_gpio_direction_out(OV5645_RESET, 0);    // reset -> L
+    usleep(5000);
 
     tsb_gpio_direction_out(OV5645_PWDN, 1);     // shutdown -> H
-    loop = 1000;
-    while(loop--);
+    usleep(1000);
+
+    tsb_gpio_direction_out(OV5645_RESET, 1);    // reset -> H
+    usleep(1000);
 
     cam_i2c = up_i2cinitialize(OV5645_APB3_I2C0);
     if (!cam_i2c) {

@@ -145,7 +145,7 @@ struct camera_sensor ov5645_sensor = {
 
 static void *camera_fn(void *p_data)
 {
-    ov5645_init(0);
+    //ov5645_init(0);
     csi_initialize(&ov5645_sensor, TSB_CDSI1, TSB_CDSI_RX);
     return NULL;
 }
