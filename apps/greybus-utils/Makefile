@@ -88,6 +88,10 @@ ifeq ($(CONFIG_MANIFEST_GPIO_I2C), y)
  MANIFEST = simple-gpio-i2c-module
 endif
 
+ifeq ($(CONFIG_MANIFEST_GPIO_I2C_PWM), y)
+ MANIFEST = simple-gpio-i2c-pwm-module
+endif
+
 ifeq ($(CONFIG_MANIFEST_BATTERY_GPIO_I2C), y)
  MANIFEST = simple-battery-gpio-i2c-module
 endif

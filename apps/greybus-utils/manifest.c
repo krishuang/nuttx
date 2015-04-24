@@ -45,6 +45,7 @@ struct gb_cport {
 
 extern void gb_gpio_register(int cport);
 extern void gb_i2c_register(int cport);
+extern void gb_pwm_register(int cport);
 extern void gb_battery_register(int cport);
 
 struct greybus {
@@ -108,6 +109,10 @@ void enable_cports(void)
             if (protocol == GREYBUS_PROTOCOL_LOOPBACK) {
                 gb_info("Registering Loopback greybus driver.\n");
                 gb_loopback_register(id);
+			}
+            if (protocol == GREYBUS_PROTOCOL_PWM) {
+                gb_info("Registering PWM greybus driver.\n");
+                gb_pwm_register(id);
             }
         }
         i++;

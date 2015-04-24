@@ -90,6 +90,8 @@ struct svc_connection {
 #define DEMO_GPIO_APB2_CPORT    (5)
 #define DEMO_I2C_APB1_CPORT     (1)
 #define DEMO_I2C_APB2_CPORT     (4)
+#define DEMO_PWM_APB1_CPORT     (2)
+#define DEMO_PWM_APB2_CPORT     (3)
 #define DEMO_DSI_APB1_CPORT     (16)
 #define DEMO_DSI_APB2_CPORT     (16)
 
@@ -107,6 +109,8 @@ static struct svc_connection conn[] = {
     { DEV_ID_APB1, DEMO_GPIO_APB1_CPORT, DEV_ID_APB2, DEMO_GPIO_APB2_CPORT },
     // APB1, CPort 1 <-> APB2, CPort 4, for I2C
     { DEV_ID_APB1, DEMO_I2C_APB1_CPORT, DEV_ID_APB2, DEMO_I2C_APB2_CPORT },
+    // APB1, CPort 2 <-> APB2, CPort 3, for PWM
+    { DEV_ID_APB1, DEMO_PWM_APB1_CPORT, DEV_ID_APB2, DEMO_PWM_APB2_CPORT },    
     // APB1, CPort 16 <-> APB2, CPort 16, for DSI
     { DEV_ID_APB1, DEMO_DSI_APB1_CPORT, DEV_ID_APB2, DEMO_DSI_APB2_CPORT },
 #elif defined(CONFIG_SVC_ROUTE_SPRING6_APB2)

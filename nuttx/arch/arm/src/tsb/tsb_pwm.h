@@ -32,6 +32,7 @@
 #define TSB_PWM_DIV           (16)
 #define TSB_PWM_CLK           (48000000 / TSB_PWM_DIV)
 
+#define TSB_PWM_NUMBER        2
 #define TSB_PWM_BASE          0x40004000
 #define TSB_PWM0              0x40004000
 #define TSB_PWM1              0x40004020
