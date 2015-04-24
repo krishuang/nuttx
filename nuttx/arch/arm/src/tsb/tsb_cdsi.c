@@ -153,7 +153,9 @@ struct cdsi_dev *csi_initialize(struct camera_sensor *sensor, int cdsi, int tx)
     if (!dev)
         return NULL;
 
-    sensor->cdsi_sensor_init(dev);
+    if(sensor->cdsi_sensor_init) {
+        sensor->cdsi_sensor_init(dev);
+    }
 
     return dev;
 }
