@@ -128,7 +128,7 @@ void ov5645_csi_init(struct cdsi_dev *dev)
 
     cdsi_write(dev, CDSI0_AL_TX_BRG_CDSITX_MODE_OFFS,
                AL_TX_BRG_CDSITX_MODE_VAL);
-    cdsi_write(dev, CDSI0_AL_RX_BRG_MODE_OFFS, AL_TX_BRG_MODE_VAL);
+    cdsi_write(dev, CDSI0_AL_TX_BRG_MODE_OFFS, AL_TX_BRG_MODE_VAL);
 
     cdsi_write(dev, CDSI0_AL_TX_BRG_PIC_COM_SET_OFFS,
                AL_TX_BRG_PIC_COM_SET_VAL);
