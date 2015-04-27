@@ -64,7 +64,7 @@
 # Sub-directories
 
 SUBDIRS  = debug epm etm svc unipro tca lg
-SUBDIRS  += apbridge apbridge-unipro gpbridge
+SUBDIRS  += apbridge gpbridge
 SUBDIRS  += svc_power
 SUBDIRS  += pwm
 SUBDIRS  += gpio

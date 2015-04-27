@@ -40,6 +40,11 @@ include $(APPDIR)/Make.defs
 ASRCS =
 CSRCS =
 MAINSRC = apbridge.c
+ifeq ($(CONFIG_APBRIDGE_UNIPRO),y)
+MAINSRC += unipro.c
+else
+MAINSRC += gbsim.c
+endif
 
 AOBJS = $(ASRCS:.S=$(OBJEXT))
 COBJS = $(CSRCS:.c=$(OBJEXT))
