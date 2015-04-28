@@ -175,7 +175,7 @@ static struct camera_param ov5645_default_regs_init[] = {
     {0x3a15, 0xd8}, // 50Hz max exposure
     {0x3a18, 0x01}, // gain ceiling = 31.5x
     {0x3a19, 0xf8}, // gain ceiling
-// 50/0xauto, 0xde,tect
+//  50/60 auto detect
     {0x3c01, 0x34},
     {0x3c04, 0x28},
     {0x3c05, 0x98},
@@ -489,6 +489,7 @@ int ov5645_init(int mode) {
         camera_i2c_write(cam_i2c,
                          initialize_table->addr,
                          initialize_table->data);
+        usleep(100);
         initialize_table ++;
     }
     //up_i2cuninitialize(cam_i2c);
