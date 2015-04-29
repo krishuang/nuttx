@@ -230,23 +230,23 @@ bool _manifest_parse(void *data, size_t size, int release)
                      GREYBUS_VERSION_MAJOR, GREYBUS_VERSION_MINOR);
             return false;
         }
-    }
 
-    /* OK, find all the descriptors */
-    desc = (struct greybus_descriptor *)(header + 1);
-    size -= sizeof(*header);
-    while (size) {
-        int desc_size;
+        /* OK, find all the descriptors */
+        desc = (struct greybus_descriptor *)(header + 1);
+        size -= sizeof(*header);
+        while (size) {
+            int desc_size;
 
-        desc_size = identify_descriptor(desc, size, release);
-        if (desc_size <= 0) {
-            if (!desc_size)
-                gb_error("zero-sized manifest descriptor\n");
-            result = false;
-            goto out;
+            desc_size = identify_descriptor(desc, size, release);
+            if (desc_size <= 0) {
+                if (!desc_size)
+                    gb_error("zero-sized manifest descriptor\n");
+                result = false;
+                goto out;
+            }
+            desc = (struct greybus_descriptor *)((char *)desc + desc_size);
+            size -= desc_size;
         }
-        desc = (struct greybus_descriptor *)((char *)desc + desc_size);
-        size -= desc_size;
     }
 
  out:
@@ -320,6 +320,14 @@ void parse_manifest_blob(char *hpe)
         (struct greybus_manifest_header *)(hpe + HP_BASE_SIZE);
 
     manifest_parse(mh, le16toh(mh->size));
+}
+
+void release_manifest_blob(char *hpe)
+{
+    struct greybus_manifest_header *mh =
+        (struct greybus_manifest_header *)(hpe + HP_BASE_SIZE);
+
+    manifest_release(mh, le16toh(mh->size));
 }
 
 void enable_manifest(char *name, void *priv)

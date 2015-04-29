@@ -33,12 +33,13 @@
 
 #include "svc_msg.h"
 #include "greybus_manifest.h"
+#include <apps/greybus-utils/utils.h>
 
 int verbose;
 static int state = GBEMU_IDLE;
 static sem_t svc_lock;
 
-size_t(*svc_int_write) (void *data, size_t size);
+int (*svc_int_write) (void *data, size_t size);
 
 void send_svc_handshake(void)
 {
@@ -189,7 +190,7 @@ void send_svc_event(int type, char *name, void *priv)
     } else if (type == 1) {
         int mid = get_module_id(name);
         if (mid > 0) {
-            manifest_release(hpe);
+            release_manifest_blob(hpe);
             send_hot_unplug(mid);
             gb_info("%s module removed\n", name);
         } else
@@ -198,7 +199,7 @@ void send_svc_event(int type, char *name, void *priv)
     free(hpe);
 }
 
-void svc_register(size_t(*handler) (void *data, size_t size))
+void svc_register(int (*handler) (void *data, size_t size))
 {
     svc_int_write = handler;
     sem_init(&svc_lock, 0, 0);

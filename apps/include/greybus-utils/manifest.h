@@ -32,6 +32,8 @@
 void foreach_manifest(void (manifest_handler)(unsigned char *manifest_file, int manifest_number));
 void enable_cports(void);
 void parse_manifest_blob(char *hpe);
+void release_manifest_blob(char *hpe);
+void send_ap_id(int mid);
 
 #endif
 
