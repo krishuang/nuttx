@@ -51,6 +51,18 @@ void depress_powerkey(void)
     tsb_gpio_uninitialize();
 }
 
+void ps_hold(void)
+{
+    tsb_gpio_initialize();
+    tsb_gpio_direction_out(8, 1);
+}
+
+void ps_release(void)
+{
+    tsb_gpio_direction_out(8, 0);
+    tsb_gpio_uninitialize();
+}
+
 void lg4892_dsi_init(struct cdsi_dev *dev)
 {
     uint32_t rdata0;
@@ -155,5 +167,6 @@ static void *display_fn(void *p_data)
 
 int display_init(void)
 {
+    ps_hold();    /* TODO: Move it to a better place */
     return pthread_create(&g_display_thread, NULL, display_fn, NULL);
 }
