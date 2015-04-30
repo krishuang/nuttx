@@ -41,8 +41,8 @@
 
 static pthread_t g_camera_thread;
 
-void ov5645_csi_init(struct cdsi_dev *dev)
-{
+void ov5645_csi_init(struct cdsi_dev *dev) {
+
     uint32_t rdata0;
     uint32_t rdata1;
 
@@ -143,14 +143,15 @@ struct camera_sensor ov5645_sensor = {
     .cdsi_sensor_init = ov5645_csi_init,
 };
 
-static void *camera_fn(void *p_data)
-{
+static void *camera_fn(void *p_data) {
+
     //ov5645_init(0);
     csi_initialize(&ov5645_sensor, TSB_CDSI1, TSB_CDSI_RX);
+
     return NULL;
 }
 
-int camera_init(void)
-{
+int camera_init(void) {
+
     return pthread_create(&g_camera_thread, NULL, camera_fn, NULL);
 }

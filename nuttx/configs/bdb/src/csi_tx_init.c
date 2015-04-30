@@ -113,15 +113,8 @@
 
 static pthread_t g_camera_thread;
 
-int ov5645_init(int mode)
-{
-    printf("ov5645_init\n");
+void ov5645_csi_init(struct cdsi_dev *dev) {
 
-    return 0;
-}
-
-void ov5645_csi_init(struct cdsi_dev *dev)
-{
     uint32_t rdata;
 
     printf("ov5645_csi_init callback function for CSI-2 tx\n");
@@ -348,13 +341,14 @@ struct camera_sensor ov5645_sensor = {
     .cdsi_sensor_init = ov5645_csi_init,
 };
 
-static void *camera_fn(void *p_data)
-{
-    csi_initialize(&ov5645_sensor, TSB_CDSI0, TSB_CDSI_TX);
+static void *camera_fn(void *p_data) {
+
+    csi_initialize(&ov5645_sensor, TSB_CDSI1, TSB_CDSI_TX);
+
     return NULL;
 }
 
-int camera_init(void)
-{
+int camera_init(void) {
+
     return pthread_create(&g_camera_thread, NULL, camera_fn, NULL);
 }
