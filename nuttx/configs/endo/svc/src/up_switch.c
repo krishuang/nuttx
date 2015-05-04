@@ -66,12 +66,16 @@
 /* DeviceIDs for modules */
 #define DEMO_SETUP_AP_M_DEVID       10
 #define DEMO_SETUP_LCD_M_DEVID      14
+#define DEMO_SETUP_CAMERA_M_DEVID   15
 /* CPorts in use */
 #define DEV1_SETUP_I2C_CPORT        0
 #define DEV1_SETUP_GPIO_CPORT       1
 #define DEV2_SETUP_I2C_CPORT        5
 #define DEV2_SETUP_GPIO_CPORT       4
+#define DEV3_SETUP_I2C_CPORT        5
+#define DEV3_SETUP_GPIO_CPORT       4
 #define DEMO_SETUP_LCD_CPORT        16
+#define DEMO_SETUP_CAMERA_CPORT     17
 /* Settle delays, in second */
 #define SWITCH_SETTLE_INITIAL_DELAY 1
 #define SWITCH_SETTLE_DELAY         1
@@ -832,7 +836,7 @@ void switch_assign_deviceid(uint32_t link_status)
 int switch_control(int state)
 {
     uint32_t attr_value, link_status;
-    uint8_t dev1, dev2;
+    uint8_t dev1, dev2, dev3;
     int i;
 
     dbg_info("%s(): state %d\n", __func__, state);
@@ -926,6 +930,8 @@ start_switch:
                           spring_port_map[PORT_ID_SPRING_C]);
         switch_lut_setreq(DEMO_SETUP_LCD_M_DEVID,
                           spring_port_map[PORT_ID_SPRING_M]);
+        switch_lut_setreq(DEMO_SETUP_CAMERA_M_DEVID,
+                          spring_port_map[PORT_ID_SPRING_D]);
 
         /* Wait for switch to settle */
         sleep(SWITCH_SETTLE_DELAY);
@@ -971,6 +977,16 @@ start_switch:
                     dbg_info("%s(): new deviceId %d for port %d\n",
                              __func__, DEMO_SETUP_LCD_M_DEVID, i);
                 }
+                /* Camera module on Spring D */
+                if (i == spring_port_map[PORT_ID_SPRING_D]) {
+                    switch_peer_setreq(i, N_DEVICEID, NCP_SELINDEX_NULL,
+                                       DEMO_SETUP_CAMERA_M_DEVID);
+                    switch_peer_setreq(i, N_DEVICEID_VALID, NCP_SELINDEX_NULL,
+                                       1);
+                    deviceid_table_update(i, DEMO_SETUP_CAMERA_M_DEVID);
+                    dbg_info("%s(): new deviceId %d for port %d\n",
+                             __func__, DEMO_SETUP_CAMERA_M_DEVID, i);
+                }
             }
         }
 
@@ -981,6 +997,7 @@ start_switch:
         dbg_ui("\nCreating Spring C <-> Spring M routing entries\n");
         dev1 = deviceid_table_get_deviceid(spring_port_map[PORT_ID_SPRING_C]);
         dev2 = deviceid_table_get_deviceid(spring_port_map[PORT_ID_SPRING_M]);
+        dev3 = deviceid_table_get_deviceid(spring_port_map[PORT_ID_SPRING_D]);
         if (dev1 != INVALID_ID && dev2 != INVALID_ID) {
             /*
              * Set up cports:
@@ -995,6 +1012,19 @@ start_switch:
                                         dev2, DEMO_SETUP_LCD_CPORT);
             /* Green LED */
             debug_rgb_led(0, 1, 0);
+        }
+
+        if (dev1 != INVALID_ID && dev3 != INVALID_ID) {
+            /*
+             * Set up cports:
+             *    [17]<->[17] for CSI
+             */
+            switch_configure_connection(dev1, DEV1_SETUP_I2C_CPORT,
+                                        dev3, DEV3_SETUP_I2C_CPORT);
+            switch_configure_connection(dev1, DEV1_SETUP_GPIO_CPORT,
+                                        dev3, DEV3_SETUP_GPIO_CPORT);
+            switch_configure_connection(dev1, DEMO_SETUP_CAMERA_CPORT,
+                                        dev3, DEMO_SETUP_CAMERA_CPORT);
         }
 
         /* Dump routing table */
