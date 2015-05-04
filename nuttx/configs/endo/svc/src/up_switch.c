@@ -1024,7 +1024,8 @@ start_switch:
             switch_configure_connection(dev1, DEV1_SETUP_GPIO_CPORT,
                                         dev3, DEV3_SETUP_GPIO_CPORT);
             switch_configure_connection(dev1, DEMO_SETUP_CAMERA_CPORT,
-                                        dev3, DEMO_SETUP_CAMERA_CPORT);
+                                        //dev3, DEMO_SETUP_CAMERA_CPORT);
+                                        dev3, DEMO_SETUP_LCD_CPORT);   // on APBridgeE of Endo, CPort fo CSI is 16
         }
 
         /* Dump routing table */
