@@ -99,7 +99,7 @@ struct svc_connection {
 #define DEMO_DSI_APB1_CPORT     (16)
 #define DEMO_DSI_APB2_CPORT     (16)
 #define DEMO_CSI_APB1_CPORT     (17)
-#define DEMO_CSI_APB3_CPORT     (17)
+#define DEMO_CSI_APB3_CPORT     (16)
 
 /* Interface name to deviceID mapping table */
 static struct svc_interface_device_id devid[] = {
@@ -146,11 +146,11 @@ static struct svc_connection conn[] = {
     { DEV_ID_APB1, DEMO_I2C_APB1_CPORT, DEV_ID_APB2, DEMO_I2C_APB2_CPORT },
     // APB1, CPort 16 <-> APB2, CPort 16, for DSI
     { DEV_ID_APB1, DEMO_DSI_APB1_CPORT, DEV_ID_APB2, DEMO_DSI_APB2_CPORT },
-    // APB1, CPort 2 <-> APB3, CPort 5, for GPIO
+    // APB1, CPort 2 <-> SPRING7, CPort 5, for GPIO
     { DEV_ID_APB1, DEMO_GPIO_APB1_CPORT2, DEV_ID_SPRING7, DEMO_GPIO_APB3_CPORT },
-    // APB1, CPort 3 <-> APB3, CPort 4, for I2C
+    // APB1, CPort 3 <-> SPRING7, CPort 4, for I2C
     { DEV_ID_APB1, DEMO_I2C_APB1_CPORT2, DEV_ID_SPRING7, DEMO_I2C_APB3_CPORT },
-    // APB1, CPort 17 <-> APB3, CPort 17, for CSI
+    // APB1, CPort 17 <-> SPRING7, CPort 16, for CSI
     { DEV_ID_APB1, DEMO_CSI_APB1_CPORT, DEV_ID_SPRING7, DEMO_CSI_APB3_CPORT },
 
 #endif
