@@ -24,6 +24,11 @@ int bridge_main(int argc, char *argv[])
     display_init();
 #endif
 
+#ifdef CONFIG_BOARD_HAVE_CAMERA
+    printf("Calling camera_init\n");
+    camera_init();
+#endif
+
     tsb_device_table_register();
     tsb_driver_register();
 
