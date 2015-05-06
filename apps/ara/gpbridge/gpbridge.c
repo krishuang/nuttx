@@ -14,6 +14,11 @@ int bridge_main(int argc, char *argv[])
     display_init();
 #endif
 
+#ifdef CONFIG_BOARD_HAVE_CAMERA
+    printf("Calling camera_init\n");
+    camera_init();
+#endif
+
     enable_manifest("MID-1", NULL);
     gb_unipro_init();
     enable_cports();
