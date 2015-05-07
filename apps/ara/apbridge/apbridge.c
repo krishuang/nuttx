@@ -144,6 +144,10 @@ int bridge_main(int argc, char *argv[])
     display_init();
 #endif
 
+#ifdef CONFIG_BOARD_HAVE_CAMERA
+    camera_init();
+#endif
+
     svc_register(recv_from_svc);
     apbridge_backend_register(&apbridge_backend);
     usbdev_apbinitialize(&usb_driver);
