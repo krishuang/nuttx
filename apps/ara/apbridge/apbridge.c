@@ -140,12 +140,13 @@ static struct apbridge_usb_driver usb_driver = {
 int bridge_main(int argc, char *argv[])
 {
     tsb_gpio_register();
-#ifdef CONFIG_BOARD_HAVE_DISPLAY
-    display_init();
-#endif
 
 #ifdef CONFIG_BOARD_HAVE_CAMERA
     camera_init();
+#endif
+
+#ifdef CONFIG_BOARD_HAVE_DISPLAY
+    display_init();
 #endif
 
     svc_register(recv_from_svc);
