@@ -87,7 +87,7 @@ struct svc_connection {
 #define DEV_ID_APB2             (2)
 #define DEV_ID_APB3             (3)
 #define DEV_ID_SPRING6          (8)
-#define DEV_ID_SPRING7         (5)
+#define DEV_ID_SPRING7          (5)
 #define DEMO_GPIO_APB1_CPORT    (0)
 #define DEMO_GPIO_APB1_CPORT2   (2)
 #define DEMO_GPIO_APB2_CPORT    (5)
@@ -99,7 +99,7 @@ struct svc_connection {
 #define DEMO_DSI_APB1_CPORT     (16)
 #define DEMO_DSI_APB2_CPORT     (16)
 #define DEMO_CSI_APB1_CPORT     (17)
-#define DEMO_CSI_APB3_CPORT     (16)
+#define DEMO_CSI_APB3_CPORT     (17)
 
 /* Interface name to deviceID mapping table */
 static struct svc_interface_device_id devid[] = {
