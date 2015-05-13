@@ -30,6 +30,11 @@
 
 #include <nuttx/device.h>
 
+struct device_driver tsb_spi_driver;
+
 void tsb_driver_register(void)
 {
+#ifdef CONFIG_ARCH_CHIP_DEVICE_SPI
+    device_register_driver(&tsb_spi_driver);
+#endif
 }
