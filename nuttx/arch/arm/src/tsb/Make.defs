@@ -58,3 +58,7 @@ CMN_CSRCS += tsb_es2_mphy_fixups.c
 else
 CMN_CSRCS += tsb_unipro_es1.c
 endif
+
+ifeq ($(CONFIG_ARCH_CHIP_DEVICE_SPI),y)
+CHIP_CSRCS += tsb_spi.c
+endif
