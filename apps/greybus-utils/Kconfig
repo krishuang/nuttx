@@ -12,8 +12,12 @@ config MANIFEST_GPIO
   bool "GPIO"
 config MANIFEST_I2C
   bool "I2C"
+config MANIFEST_SPI
+  bool "SPI"
 config MANIFEST_GPIO_I2C
   bool "I2C and GPIO"
+config MANIFEST_GPIO_I2C_SPI
+  bool "I2C, GPIO and SPI"
 config MANIFEST_BATTERY_GPIO_I2C
   bool "Battery, GPIO and I2C"
 config MANIFEST_LOOPBACK

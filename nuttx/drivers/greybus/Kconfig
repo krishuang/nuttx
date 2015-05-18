@@ -9,6 +9,10 @@ config GREYBUS_I2C_PHY
 	select I2C_TRANSFER
 	default n
 
+config GREYBUS_SPI_PHY
+	bool "SPI PHY support"
+	default n
+
 config GREYBUS_BATTERY_PHY
 	bool "Battery support"
 	default n

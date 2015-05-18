@@ -48,6 +48,7 @@ extern void gb_gpio_register(int cport);
 extern void gb_i2c_register(int cport);
 extern void gb_battery_register(int cport);
 extern void gb_loopback_register(int cport);
+extern void gb_spi_register(int cport);
 
 struct greybus {
     /* TODO use a list instead */
@@ -121,6 +122,13 @@ void enable_cports(void)
             if (protocol == GREYBUS_PROTOCOL_LOOPBACK) {
                 gb_info("Registering Loopback greybus driver.\n");
                 gb_loopback_register(id);
+            }
+#endif
+
+#ifdef CONFIG_GREYBUS_SPI_PHY
+            if (protocol == GREYBUS_PROTOCOL_SPI) {
+                gb_info("Registering SPI greybus driver.\n");
+                gb_spi_register(id);
             }
 #endif
         }
