@@ -118,7 +118,7 @@ static int tsb_spi_lock(struct device *dev, bool lock)
     struct tsb_spi_info *info = NULL;
     int ret = 0;
 
-    lldbg(lock? "lock\n" : "unlock\n");
+    lldbg("%s\n", lock ? "lock":"unlock");
 
     /* check input parameters */
     if (!dev || !dev->private) {
