@@ -55,12 +55,12 @@
 #include <nuttx/greybus/types.h>
 
 /* SPI Protocol Operation Types */
-#define GB_SPI_PROTOCOL_VERSION             0x01
-#define GB_SPI_PROTOCOL_MODE                0x02
-#define GB_SPI_PROTOCOL_FLAGS               0x03
-#define GB_SPI_PROTOCOL_BITS_PER_WORD_MASK  0x04
-#define GB_SPI_PROTOCOL_NUM_CHIPSELECT      0x05
-#define GB_SPI_PROTOCOL_TRANSFER            0x06
+#define GB_SPI_PROTOCOL_VERSION             0x01    /* Protocol Version */
+#define GB_SPI_PROTOCOL_MODE                0x02    /* Mode */
+#define GB_SPI_PROTOCOL_FLAGS               0x03    /* Flags */
+#define GB_SPI_PROTOCOL_BITS_PER_WORD_MASK  0x04    /* Bits per word mask */
+#define GB_SPI_PROTOCOL_NUM_CHIPSELECT      0x05    /* Number of Chip-select */
+#define GB_SPI_PROTOCOL_TRANSFER            0x06    /* Transfer */
 
 /* SPI Protocol Mode Bit Masks */
 #define GB_SPI_MODE_CPHA        0x01    /* clock phase */
@@ -77,32 +77,68 @@
 #define GB_SPI_FLAG_NO_RX       0x02    /* can't do buffer read */
 #define GB_SPI_FLAG_NO_TX       0x04    /* can't do buffer write */
 
-/* version request has no payload */
+
+/**
+ * struct gb_spi_proto_version_response - SPI Protocol Version Response
+ *
+ * @param major: SPI Protocol major version
+ * @param minor: SPI Protocol minor version
+ */
 struct gb_spi_proto_version_response {
     __u8    major;
     __u8    minor;
 };
 
-/* mode request has no payload */
+
+/**
+ * struct gb_spi_mode_response - SPI Protocol Mode Response
+ *
+ * @param mode: Greybus SPI Protocol Mode Bit Masks
+ */
 struct gb_spi_mode_response {
     __le16  mode;
 };
 
-/* flags request has no payload */
+
+/**
+ * struct gb_spi_flags_response - SPI Protocol Flags Response
+ *
+ * @param flags: Greybus SPI Protocol Flags Bit Masks
+ */
 struct gb_spi_flags_response {
     __le16  flags;
 };
 
-/* bits-per-word request has no payload */
+
+/**
+ * struct gb_spi_bpw_response - SPI Protocol Bits Per Word Mask Response
+ *
+ * @param bits_per_word_mask: Bits per word mask of the SPI master
+ */
 struct gb_spi_bpw_response {
     __le32  bits_per_word_mask;
 };
 
-/* num-chipselects request has no payload */
+
+/**
+ * struct gb_spi_chipselect_response - Number of Chip Selects Response
+ *
+ * @param num_chipselect: Maximum number of chip select pins
+ */
 struct gb_spi_chipselect_response {
     __le16  num_chipselect;
 };
 
+
+/**
+ * struct gb_spi_transfer_desc - SPI Protocol gb_spi_transfer descriptor
+ *
+ * @param speed_hz: Transfer speed in Hz
+ * @param len: Size of data to transfer
+ * @param delay_usecs: Wait period after completion of transfer
+ * @param cs_change: Toggle chip select pin after this transfer completes
+ * @param bits_per_word: Select bits per word for this trnasfer
+ */
 struct gb_spi_transfer_desc {
     __le32  speed_hz;
     __le32  len;
@@ -111,6 +147,15 @@ struct gb_spi_transfer_desc {
     __u8    bits_per_word;
 };
 
+
+/**
+ * struct gb_spi_transfer_request - SPI Protocol Transfer Request
+ *
+ * @param chip_select: chip-select pin for the slave device
+ * @param mode: Greybus SPI Protocol Mode Bit Masks
+ * @param count: Number of gb_spi_transfer_desc
+ * @param transfers[]: SPI gb_spi_transfer_desc array in the transfer
+ */
 struct gb_spi_transfer_request {
     __u8    chip_select;
     __u8    mode;
@@ -118,9 +163,14 @@ struct gb_spi_transfer_request {
     struct gb_spi_transfer_desc  transfers[0];
 };
 
+
+/**
+ * struct gb_spi_transfer_response - SPI Protocol Transfer Response
+ *
+ * @param data[]: Data array for read gb_spi_transfer descriptor on the transfer
+ */
 struct gb_spi_transfer_response {
     __u8    data[0];
 };
 
 #endif /* _GREYBUS_SPI_H_ */
-

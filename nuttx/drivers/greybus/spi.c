@@ -66,6 +66,15 @@
 
 struct device *spi_dev = NULL;
 
+
+/**
+ * @brief Returns the major and minor Greybus SPI protocol version number
+ *        supported by the SPI master
+ *
+ * @param operation pointer to structure of Greybus operation message
+ * @retval GB_OP_SUCCESS Success
+ * @retval GB_OP_NO_MEMORY Failed to allocate memory for response
+ */
 static uint8_t gb_spi_protocol_version(struct gb_operation *operation)
 {
     struct gb_spi_proto_version_response *response;
@@ -81,6 +90,15 @@ static uint8_t gb_spi_protocol_version(struct gb_operation *operation)
     return GB_OP_SUCCESS;
 }
 
+
+/**
+ * @brief Returns a bit mask indicating the modes supported by the SPI master
+ *
+ * @param operation pointer to structure of Greybus operation message
+ * @retval GB_OP_SUCCESS Success
+ * @retval GB_OP_INVALID Failed to get hardware capabilities
+ * @retval GB_OP_NO_MEMORY Failed to allocate memory for response
+ */
 static uint8_t gb_spi_protocol_mode(struct gb_operation *operation)
 {
     struct gb_spi_mode_response *response;
@@ -92,6 +110,7 @@ static uint8_t gb_spi_protocol_mode(struct gb_operation *operation)
         return GB_OP_NO_MEMORY;
     }
 
+    /* get hardware capabilities */
     ret = device_spi_getcaps(spi_dev,&caps);
     if (ret != 0) {
         return GB_OP_INVALID;
@@ -101,6 +120,15 @@ static uint8_t gb_spi_protocol_mode(struct gb_operation *operation)
     return GB_OP_SUCCESS;
 }
 
+
+/**
+ * @brief Returns a bit mask indicating the constraints of the SPI master
+ *
+ * @param operation pointer to structure of Greybus operation message
+ * @retval GB_OP_SUCCESS Success
+ * @retval GB_OP_INVALID Failed to get hardware capabilities
+ * @retval GB_OP_NO_MEMORY Failed to allocate memory for response
+ */
 static uint8_t gb_spi_protocol_flags(struct gb_operation *operation)
 {
     struct gb_spi_flags_response *response;
@@ -112,6 +140,7 @@ static uint8_t gb_spi_protocol_flags(struct gb_operation *operation)
         return GB_OP_NO_MEMORY;
     }
 
+    /* get hardware capabilities */
     ret = device_spi_getcaps(spi_dev,&caps);
     if (ret != 0) {
         return GB_OP_INVALID;
@@ -121,6 +150,15 @@ static uint8_t gb_spi_protocol_flags(struct gb_operation *operation)
     return GB_OP_SUCCESS;
 }
 
+
+/**
+ * @brief Returns the number of bits per word supported by the SPI master
+ *
+ * @param operation pointer to structure of Greybus operation message
+ * @retval GB_OP_SUCCESS Success
+ * @retval GB_OP_INVALID Failed to get hardware capabilities
+ * @retval GB_OP_NO_MEMORY Failed to allocate memory for response
+ */
 static uint8_t gb_spi_protocol_bpw(struct gb_operation *operation)
 {
     struct gb_spi_bpw_response *response;
@@ -132,8 +170,9 @@ static uint8_t gb_spi_protocol_bpw(struct gb_operation *operation)
         return GB_OP_NO_MEMORY;
     }
 
+    /* get hardware capabilities */
     ret = device_spi_getcaps(spi_dev,&caps);
-    if (ret) {
+    if (ret != 0) {
         return GB_OP_INVALID;
     }
 
@@ -143,6 +182,15 @@ static uint8_t gb_spi_protocol_bpw(struct gb_operation *operation)
     return GB_OP_SUCCESS;
 }
 
+
+/**
+ * @brief Returns the number of chip select pins supported by the SPI master
+ *
+ * @param operation pointer to structure of Greybus operation message
+ * @retval GB_OP_SUCCESS Success
+ * @retval GB_OP_INVALID Failed to get hardware capabilities
+ * @retval GB_OP_NO_MEMORY Failed to allocate memory for response
+ */
 static uint8_t gb_spi_protocol_num_chipselect(struct gb_operation *operation)
 {
     struct gb_spi_chipselect_response *response;
@@ -153,8 +201,10 @@ static uint8_t gb_spi_protocol_num_chipselect(struct gb_operation *operation)
     if (!response) {
         return GB_OP_NO_MEMORY;
     }
+
+    /* get hardware capabilities */
     ret = device_spi_getcaps(spi_dev,&caps);
-    if (ret) {
+    if (ret != 0) {
         return GB_OP_INVALID;
     }
     response->num_chipselect = caps.csnum;
@@ -162,6 +212,16 @@ static uint8_t gb_spi_protocol_num_chipselect(struct gb_operation *operation)
     return GB_OP_SUCCESS;
 }
 
+
+/**
+ * @brief Performs a SPI transaction as one or more SPI transfers, defined
+ *        in the supplied array.
+ *
+ * @param operation pointer to structure of Greybus operation message
+ * @retval GB_OP_SUCCESS Success
+ * @retval GB_OP_INVALID Invalid SPI operation.
+ * @retval GB_OP_NO_MEMORY Failed to allocate memory for response.
+ */
 static uint8_t gb_spi_protocol_transfer(struct gb_operation *operation)
 {
     int i, op_count;
@@ -194,58 +254,67 @@ static uint8_t gb_spi_protocol_transfer(struct gb_operation *operation)
     }
     read_buf = response->data;
 
-    // lock SPI bus
+    /* lock SPI bus */
     ret = device_spi_lock(spi_dev, true);
-    if (ret) {
+    if (ret != 0) {
         ret = GB_OP_INVALID;
         goto err_alloc;
     }
 
+    /* assert chip-select pin */
     ret = device_spi_select(spi_dev, request->chip_select, true);
-    if (ret) {
+    if (ret != 0) {
         ret = GB_OP_INVALID;
         goto err_lock;
     }
 
+    /* set SPI mode */
     ret = device_spi_setmode(spi_dev, request->mode);
-    if (ret) {
+    if (ret != 0) {
         ret = GB_OP_INVALID;
         goto err_select;
     }
 
+    /* parse all transfer request from AP host side */
     for (i = 0; i < op_count; i++) {
         desc = &request->transfers[i];
         freq = desc->speed_hz;
 
+        /* set SPI bits-per-word */
         ret = device_spi_setbits(spi_dev, desc->bits_per_word);
-        if (ret) {
+        if (ret != 0) {
             ret = GB_OP_INVALID;
             goto err_select;
         }
 
+        /* set SPI clock */
         ret = device_spi_setfrequency(spi_dev, &freq);
-        if (ret) {
+        if (ret != 0) {
             ret = GB_OP_INVALID;
             goto err_select;
         }
-        // setup SPI transfer
+        /* setup SPI transfer */
         memset(&transfer, 0, sizeof(struct device_spi_transfer));
         transfer.txbuffer = write_data;
         transfer.rxbuffer = read_buf;
         transfer.nwords = desc->len;
         transfer.flags = SPI_FLAG_DMA_TRNSFER; // synchronous & DMA transfer
 
+        /* start SPI transfer */
         ret = device_spi_exchange(spi_dev, &transfer);
-        if (ret) {
+        if (ret != 0) {
             ret = GB_OP_INVALID;
             goto err_select;
         }
+        /* move to next gb_spi_transfer data buffer */
         write_data += desc->len;
         read_buf += desc->len;
 
+        /* if cs_change enable, change the chip-select pin signal */
         if (desc->cs_change) {
+            /* force deassert chip-select pin */
             ret = device_spi_select(spi_dev, request->chip_select, false);
-            if (ret) {
+            if (ret != 0) {
                 ret = GB_OP_INVALID;
                 goto err_lock;
             }
@@ -253,14 +322,16 @@ static uint8_t gb_spi_protocol_transfer(struct gb_operation *operation)
         usleep(desc->delay_usecs);
     }
 
+    /* deassert chip-select pin */
     ret = device_spi_select(spi_dev, request->chip_select, false);
-    if (ret) {
+    if (ret != 0) {
         ret = GB_OP_INVALID;
         goto err_lock;
     }
 
+    /* set SPI unclock */
     ret = device_spi_lock(spi_dev,false);
-    if (ret) {
+    if (ret != 0) {
         ret = GB_OP_INVALID;
         goto err_alloc;
     }
@@ -277,6 +348,14 @@ err_alloc:
     return ret;
 }
 
+
+/**
+ * @brief Greybus SPI protocol initialize function
+ *
+ * @param cport cport number
+ * @retval GB_OP_SUCCESS Success
+ * @retval GB_OP_INVALID Invalid SPI operation
+ */
 static int gb_spi_init(unsigned int cport)
 {
     gb_info("%s()\n", __func__);
@@ -286,9 +365,15 @@ static int gb_spi_init(unsigned int cport)
             return GB_OP_INVALID;
         }
     }
-    return 0;
+    return GB_OP_SUCCESS;
 }
 
+
+/**
+ * @brief Greybus SPI protocol deinitialize function
+ *
+ * @param cport cport number
+ */
 static void gb_spi_exit(unsigned int cport)
 {
     gb_info("%s()\n", __func__);
@@ -298,6 +383,10 @@ static void gb_spi_exit(unsigned int cport)
     }
 }
 
+
+/**
+ * @brief Greybus SPI protocol operation handler
+ */
 static struct gb_operation_handler gb_spi_handlers[] = {
     GB_HANDLER(GB_SPI_PROTOCOL_VERSION, gb_spi_protocol_version),
     GB_HANDLER(GB_SPI_PROTOCOL_MODE, gb_spi_protocol_mode),
@@ -307,6 +396,7 @@ static struct gb_operation_handler gb_spi_handlers[] = {
     GB_HANDLER(GB_SPI_PROTOCOL_TRANSFER, gb_spi_protocol_transfer),
 };
 
+
 static struct gb_driver gb_spi_driver = {
     .init = gb_spi_init,
     .exit = gb_spi_exit,
@@ -314,11 +404,25 @@ static struct gb_driver gb_spi_driver = {
     .op_handlers_count = ARRAY_SIZE(gb_spi_handlers),
 };
 
+
+/**
+ * @brief Register Greybus SPI protocol
+ *
+ * @param cport cport number
+ */
 void gb_spi_register(int cport)
 {
     gb_register_driver(cport, &gb_spi_driver);
 }
 
+
+/**
+ * @brief Set SPI device
+ *
+ * @param device pointer to structure of device data
+ * @retval 0 Success
+ * @retval -EBUSY device has been assigned.
+ */
 int gb_spi_set_dev(struct device *dev)
 {
     if (!spi_dev)
@@ -328,6 +432,12 @@ int gb_spi_set_dev(struct device *dev)
     return 0;
 }
 
+
+/**
+ * @brief Get SPI device
+ *
+ * @return a device pointer.
+ */
 struct device *gb_spi_get_dev(void)
 {
     return spi_dev;

@@ -57,8 +57,8 @@
 
 #define DEVICE_TYPE_SPI_HW          "spi"
 
-#define SPI_FLAG_ASYNC_TRANSFER     0x01
-#define SPI_FLAG_DMA_TRNSFER        0x02
+#define SPI_FLAG_ASYNC_TRANSFER     0x01        /* non-blocking transfer */
+#define SPI_FLAG_DMA_TRNSFER        0x02        /* DMA transfer */
 
 /* SPI mode definition */
 #define SPI_MODE_CPHA               0x01        /* clock phase */
@@ -83,6 +83,21 @@
 /* error code */
 #define SUCCESS                     0
 
+
+/**
+ * struct device_spi_transfer - SPI a read/write buffer pair
+ *
+ * @param txbuffer: Data to be written, or NULL
+ * @param rxbuffer: Data to be read, or NULL
+ * @param nwords: Size of rx and tx buffers
+ * @param flags: SPI transfer mode
+ * @param timeout: Timeout value (milliseconds) for SPI transfer. Timeout value
+ *                 must larger then 0, timeout <=0 means infinite timeout
+ * @param complete: Called to report transaction completion, only for
+ *                  asynchronous SPI transfer
+ * @param context: The argument to complete() function when it's called
+ * @param status: Return code for asynchronous SPI transfer
+ */
 struct device_spi_transfer {
     void *txbuffer;
     void *rxbuffer;
@@ -95,13 +110,34 @@ struct device_spi_transfer {
     int status;
 };
 
+
+/**
+ * struct device_spi_caps - SPI hardware capabilities info
+ *
+ * @param modes: bit masks of supported SPI protocol mode
+ * @param flags: bit masks of supported SPI protocol flags
+ * @param bpw: number of bits per word supported
+ * @param csnum: number of chip select pins supported
+ */
 struct device_spi_caps {
-    uint16_t modes;     /* bit masks of supported SPI protocol mode */
-    uint16_t flags;     /* bit masks of supported SPI protocol flags */
-    uint16_t bpw;       /* number of bits per word supported */
-    uint16_t csnum;     /* number of chip select pins supported */
+    uint16_t modes;
+    uint16_t flags;
+    uint16_t bpw;
+    uint16_t csnum;
 };
 
+
+/**
+ * struct device_spi_type_ops - SPI device driver operations
+ *
+ * @param lock: SPI lock() function pointer
+ * @param select: SPI select() function pointer
+ * @param setfrequency: SPI setfrequency() function pointer
+ * @param setmode: SPI setmode() function pointer
+ * @param setbits: SPI setbits() function pointer
+ * @param exchange: SPI exchange() function pointer
+ * @param getcaps: SPI getcaps() function pointer
+ */
 struct device_spi_type_ops {
     int (*lock)(struct device *dev, bool lock);
     int (*select)(struct device *dev, int devid, bool selected);
@@ -112,6 +148,10 @@ struct device_spi_type_ops {
     int (*getcaps)(struct device *dev, struct device_spi_caps *caps);
 };
 
+
+/**
+ * @brief SPI lock/unlock wrap function
+ */
 static inline int device_spi_lock(struct device *dev, bool lock)
 {
     if (dev->state != DEVICE_STATE_OPEN) {
@@ -123,6 +163,10 @@ static inline int device_spi_lock(struct device *dev, bool lock)
     return -EOPNOTSUPP;
 }
 
+
+/**
+ * @brief SPI select wrap function
+ */
 static inline int device_spi_select(struct device *dev,
                                     int devid,
                                     bool selected)
@@ -136,6 +180,10 @@ static inline int device_spi_select(struct device *dev,
     return -EOPNOTSUPP;
 }
 
+
+/**
+ * @brief SPI setfrequency wrap function
+ */
 static inline int device_spi_setfrequency(struct device *dev,
                                           uint32_t *frequency)
 {
@@ -148,6 +196,10 @@ static inline int device_spi_setfrequency(struct device *dev,
     return -EOPNOTSUPP;
 }
 
+
+/**
+ * @brief SPI setmode wrap function
+ */
 static inline int device_spi_setmode(struct device *dev, uint16_t mode)
 {
     if (dev->state != DEVICE_STATE_OPEN) {
@@ -159,6 +211,10 @@ static inline int device_spi_setmode(struct device *dev, uint16_t mode)
     return -EOPNOTSUPP;
 }
 
+
+/**
+ * @brief SPI setbits wrap function
+ */
 static inline int device_spi_setbits(struct device *dev, int nbits)
 {
     if (dev->state != DEVICE_STATE_OPEN) {
@@ -170,6 +226,10 @@ static inline int device_spi_setbits(struct device *dev, int nbits)
     return -EOPNOTSUPP;
 }
 
+
+/**
+ * @brief SPI exchange wrap function
+ */
 static inline int device_spi_exchange(struct device *dev,
                                       struct device_spi_transfer *transfer)
 {
@@ -182,6 +242,10 @@ static inline int device_spi_exchange(struct device *dev,
     return -EOPNOTSUPP;
 }
 
+
+/**
+ * @brief SPI getcaps wrap function
+ */
 static inline int device_spi_getcaps(struct device *dev,
                                      struct device_spi_caps *caps)
 {
