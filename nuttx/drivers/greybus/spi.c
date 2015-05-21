@@ -261,18 +261,11 @@ static uint8_t gb_spi_protocol_transfer(struct gb_operation *operation)
         goto err_alloc;
     }
 
-    /* assert chip-select pin */
-    ret = device_spi_select(spi_dev, request->chip_select, true);
-    if (ret != 0) {
-        ret = GB_OP_INVALID;
-        goto err_lock;
-    }
-
     /* set SPI mode */
     ret = device_spi_setmode(spi_dev, request->mode);
     if (ret != 0) {
         ret = GB_OP_INVALID;
-        goto err_select;
+        goto err_lock;
     }
 
     /* parse all transfer request from AP host side */
@@ -284,15 +277,23 @@ static uint8_t gb_spi_protocol_transfer(struct gb_operation *operation)
         ret = device_spi_setbits(spi_dev, desc->bits_per_word);
         if (ret != 0) {
             ret = GB_OP_INVALID;
-            goto err_select;
+            goto err_lock;
         }
 
         /* set SPI clock */
         ret = device_spi_setfrequency(spi_dev, &freq);
         if (ret != 0) {
             ret = GB_OP_INVALID;
+            goto err_lock;
+        }
+
+        /* assert chip-select pin */
+        ret = device_spi_select(spi_dev, request->chip_select, true);
+        if (ret != 0) {
+            ret = GB_OP_INVALID;
             goto err_select;
         }
+
         /* setup SPI transfer */
         memset(&transfer, 0, sizeof(struct device_spi_transfer));
         transfer.txbuffer = write_data;
@@ -319,7 +320,10 @@ static uint8_t gb_spi_protocol_transfer(struct gb_operation *operation)
                 goto err_lock;
             }
         }
-        usleep(desc->delay_usecs);
+
+        if (desc->delay_usecs) {
+            usleep(desc->delay_usecs);
+        }
     }
 
     /* deassert chip-select pin */
