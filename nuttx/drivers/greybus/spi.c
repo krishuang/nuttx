@@ -311,6 +311,10 @@ static uint8_t gb_spi_protocol_transfer(struct gb_operation *operation)
         write_data += desc->len;
         read_buf += desc->len;
 
+        if (desc->delay_usecs) {
+            usleep(desc->delay_usecs);
+        }
+
         /* if cs_change enable, change the chip-select pin signal */
         if (desc->cs_change) {
             /* force deassert chip-select pin */
@@ -319,10 +323,6 @@ static uint8_t gb_spi_protocol_transfer(struct gb_operation *operation)
                 ret = GB_OP_INVALID;
                 goto err_lock;
             }
-        }
-
-        if (desc->delay_usecs) {
-            usleep(desc->delay_usecs);
         }
     }
 
