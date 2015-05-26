@@ -92,6 +92,14 @@ ifeq ($(CONFIG_MANIFEST_GPIO_I2C), y)
  MANIFEST = simple-gpio-i2c-module
 endif
 
+ifeq ($(CONFIG_MANIFEST_SPI), y)
+ MANIFEST = simple-spi-module
+endif
+
+ifeq ($(CONFIG_MANIFEST_GPIO_I2C_SPI), y)
+ MANIFEST = simple-gpio-i2c-spi-module
+endif
+
 ifeq ($(CONFIG_MANIFEST_BATTERY_GPIO_I2C), y)
  MANIFEST = simple-battery-gpio-i2c-module
 endif
@@ -110,6 +118,10 @@ endif
 
 ifeq ($(CONFIG_MANIFEST_GPIO_I2C_VIBRATOR), y)
  MANIFEST = simple-gpio-i2c-vibrator-module
+endif
+
+ifeq ($(CONFIG_MANIFEST_GPIO_I2C_VIBRATOR_SPI), y)
+ MANIFEST = simple-gpio-i2c-vibrator-spi-module
 endif
 
 ifeq ($(CONFIG_CUSTOM_MANIFEST), y)
