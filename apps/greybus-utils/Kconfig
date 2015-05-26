@@ -11,9 +11,11 @@ choice
 config MANIFEST_GPIO
 	bool "GPIO"
 config MANIFEST_I2C
-	bool "I2C"
+  bool "I2C"
+config MANIFEST_SPI
+	bool "SPI"
 config MANIFEST_GPIO_I2C
-	bool "I2C and GPIO"
+  bool "I2C and GPIO"
 config MANIFEST_BATTERY_GPIO_I2C
 	bool "Battery, GPIO and I2C"
 config MANIFEST_LOOPBACK
@@ -22,6 +24,8 @@ config MANIFEST_VIBRATOR
 	bool "Vibrator"
 config MANIFEST_GPIO_I2C_VIBRATOR
 	bool "GPIO, I2C, and Vibrator"
+config MANIFEST_KITCHEN_SINK
+	bool "GPIO, I2C, Vibrator and SPI"
 config CUSTOM_MANIFEST
 	bool "Custom manifest"
 endchoice
