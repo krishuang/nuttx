@@ -1,0 +1,32 @@
+;
+; Simple SPI Interface Manifest
+;
+
+[manifest-header]
+version-major = 0
+version-minor = 1
+
+[interface-descriptor]
+vendor-string-id = 1
+product-string-id = 2
+
+; Interface vendor string (id can't be 0)
+[string-descriptor "1"]
+id = 1
+string = "Project Ara"
+
+; Interface product string (id can't be 0)
+[string-descriptor "2"]
+id = 2
+string = "Simple SPI Interface"
+
+; SPI protocol on CPort 9
+[cport-descriptor "9"]
+bundle = 0
+id = 9
+protocol = 0x0b
+
+; Bundle 0
+[bundle-descriptor "0"]
+id = 0
+class = 0x00
