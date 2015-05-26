@@ -45,6 +45,7 @@ enum device_state {
 };
 
 struct device_pll_type_ops;
+struct device_spi_type_ops;
 
 struct device_driver_ops {
     int     (*probe)(struct device *dev);
@@ -53,6 +54,7 @@ struct device_driver_ops {
     void    (*close)(struct device *dev);
     union {
         struct device_pll_type_ops     *pll;
+        struct device_spi_type_ops     *spi;
     } type_ops;
 };
 
