@@ -33,6 +33,7 @@
 #include <nuttx/device_resource.h>
 #include <nuttx/device_table.h>
 #include <nuttx/device_pll.h>
+#include <nuttx/device_spi.h>
 #include <nuttx/usb.h>
 
 #include "chip.h"
@@ -47,6 +48,17 @@ static struct device_resource tsb_plla_resources[] = {
         .type   = DEVICE_RESOURCE_TYPE_REGS,
         .start  = SYSCTL_BASE + TSB_PLLA_CG_BRIDGE_OFFSET,
         .count  = TSB_PLLA_SIZE,
+    },
+};
+#endif
+
+#ifdef CONFIG_ARCH_CHIP_DEVICE_SPI
+static struct device_resource tsb_spi_resources[] = {
+    {
+        .name   = "reg_base",
+        .type   = DEVICE_RESOURCE_TYPE_REGS,
+        .start  = SPI_BASE,
+        .count  = SPI_SIZE,
     },
 };
 #endif
@@ -76,6 +88,16 @@ static struct device tsb_device_table[] = {
         .name           = "dwc2_hcd",
         .desc           = "DWC2 USB Host controller",
         .id             = 0,
+    },
+#endif
+#ifdef CONFIG_ARCH_CHIP_DEVICE_SPI
+    {
+        .type           = DEVICE_TYPE_SPI_HW,
+        .name           = "tsb_spi",
+        .desc           = "TSB SPI master Controller",
+        .id             = 0,
+        .resources      = tsb_spi_resources,
+        .resource_count = ARRAY_SIZE(tsb_spi_resources),
     },
 #endif
 };
