@@ -71,6 +71,7 @@ SUBDIRS  += gpio
 SUBDIRS  += bdbpm
 SUBDIRS  += springpm
 SUBDIRS  += pinshare
+SUBDIRS  += spi
 
 # Sub-directories that might need context setup.  Directories may need
 # context setup for a variety of reasons, but the most common is because
@@ -79,6 +80,7 @@ SUBDIRS  += pinshare
 CNTXTDIRS = debug epm etm pwm svc unipro lg
 CNTXTDIRS += gpio
 CNTXTDIRS += pinshare
+CNTXTDIRS += spi
 
 ifeq ($(CONFIG_NSH_BUILTIN_APPS),y)
 CNTXTDIRS += debug epm etm pwm svc unipro lg
@@ -86,6 +88,7 @@ CNTXTDIRS += gpio
 CNTXTDIRS += bdbpm
 CNTXTDIRS += springpm
 CNTXTDIRS += pinshare
+CNTXTDIRS += spi
 endif
 
 all: nothing

@@ -1,0 +1,25 @@
+#
+# For a description of the syntax of this configuration file,
+# see misc/tools/kconfig-language.txt.
+#
+
+config ARA_SPI_BITBANG_TEST
+	bool "Ara SPI bit-bang device driver test program"
+	default n if !DEBUG
+	default y if DEBUG
+	depends on ARCH_CHIP_TSB
+	---help---
+		Enable the SPI bitbang test program.
+
+
+if ARA_SPI_BITBANG_TEST
+
+config ARA_SPI_BITBANG_TEST_PROGNAME
+	string "Program name"
+	default "spi_test"
+	depends on BUILD_KERNEL
+	---help---
+		This is the name of the program that will be used when the
+		NSH ELF program is installed.
+
+endif

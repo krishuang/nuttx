@@ -118,3 +118,7 @@ endif
 ifeq ($(CONFIG_ARA_BRIDGE_PINSHARE),y)
 CONFIGURED_APPS += ara/pinshare
 endif
+
+ifeq ($(CONFIG_ARA_SPI_BITBANG_TEST),y)
+CONFIGURED_APPS += ara/spi
+endif
