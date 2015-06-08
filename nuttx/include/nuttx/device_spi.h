@@ -99,7 +99,7 @@ struct device_spi_transfer {
 struct device_spi_caps {
     uint16_t modes;
     uint16_t flags;
-    uint16_t bpw;
+    uint32_t bpw;
     uint16_t csnum;
 };
 
@@ -108,6 +108,7 @@ struct device_spi_caps {
  * struct device_spi_type_ops - SPI device driver operations
  *
  * @param lock: SPI lock() function pointer
+ * @param unlock: SPI unlock() function pointer
  * @param select: SPI select() function pointer
  * @param setfrequency: SPI setfrequency() function pointer
  * @param setmode: SPI setmode() function pointer
@@ -116,7 +117,8 @@ struct device_spi_caps {
  * @param getcaps: SPI getcaps() function pointer
  */
 struct device_spi_type_ops {
-    int (*lock)(struct device *dev, bool lock);
+    int (*lock)(struct device *dev);
+    int (*unlock)(struct device *dev);
     int (*select)(struct device *dev, int devid, bool selected);
     int (*setfrequency)(struct device *dev, uint32_t *frequency);
     int (*setmode)(struct device *dev, uint16_t mode);
@@ -127,15 +129,30 @@ struct device_spi_type_ops {
 
 
 /**
- * @brief SPI lock/unlock wrap function
+ * @brief SPI lock wrap function
  */
-static inline int device_spi_lock(struct device *dev, bool lock)
+static inline int device_spi_lock(struct device *dev)
 {
     if (dev->state != DEVICE_STATE_OPEN) {
         return -ENODEV;
     }
     if (dev->driver->ops->type_ops.spi->lock) {
-        return dev->driver->ops->type_ops.spi->lock(dev, lock);
+        return dev->driver->ops->type_ops.spi->lock(dev);
+    }
+    return -EOPNOTSUPP;
+}
+
+
+/**
+ * @brief SPI unlock wrap function
+ */
+static inline int device_spi_unlock(struct device *dev)
+{
+    if (dev->state != DEVICE_STATE_OPEN) {
+        return -ENODEV;
+    }
+    if (dev->driver->ops->type_ops.spi->unlock) {
+        return dev->driver->ops->type_ops.spi->unlock(dev);
     }
     return -EOPNOTSUPP;
 }

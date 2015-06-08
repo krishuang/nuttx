@@ -51,7 +51,8 @@ static struct device_resource tsb_plla_resources[] = {
 };
 #endif
 
-#ifdef CONFIG_ARCH_CHIP_DEVICE_SPI
+#if defined(CONFIG_ARCH_CHIP_DEVICE_SPI) && \
+    !defined(CONFIG_ARCH_CHIP_DEVICE_SPI_BITBANG)
 static struct device_resource tsb_spi_resources[] = {
     {
         .name   = "reg_base",
@@ -79,8 +80,10 @@ static struct device tsb_device_table[] = {
         .name           = "tsb_spi",
         .desc           = "TSB SPI master Controller",
         .id             = 0,
+#ifndef CONFIG_ARCH_CHIP_DEVICE_SPI_BITBANG
         .resources      = tsb_spi_resources,
         .resource_count = ARRAY_SIZE(tsb_spi_resources),
+#endif
     },
 #endif
 };

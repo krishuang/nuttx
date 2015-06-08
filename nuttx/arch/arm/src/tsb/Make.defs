@@ -60,5 +60,5 @@ CMN_CSRCS += tsb_unipro_es1.c
 endif
 
 ifeq ($(CONFIG_ARCH_CHIP_DEVICE_SPI),y)
-CHIP_CSRCS += tsb_spi.c
+CHIP_CSRCS += tsb_spi_bitbang.c
 endif
