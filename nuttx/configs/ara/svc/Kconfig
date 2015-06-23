@@ -9,4 +9,8 @@ config SVC_ROUTE_DEFAULT
 	bool "APB1 to APB2"
 config SVC_ROUTE_SPRING6_APB2
 	bool "AP Module to APB2"
+config SVC_ROUTE_APB1_APB2_APB3
+	bool "APB1 to APB2 and APB3"
+config SVC_ROUTE_APB1_APB2_SPRING7
+	bool "APB1 to APB2 and Camera Module"
 endchoice

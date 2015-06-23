@@ -84,12 +84,16 @@ struct svc_interface_device_id {
 #define DEV_ID_GPB1              (4)
 #define DEV_ID_GPB2              (5)
 #define DEV_ID_SPRING6           (8)
+#define DEV_ID_SPRING7           (5)
 #define DEMO_GPIO_APB1_CPORT     (0)
 #define DEMO_GPIO_APB2_CPORT     (5)
 #define DEMO_I2C_APB1_CPORT      (1)
 #define DEMO_I2C_APB2_CPORT      (4)
 #define DEMO_DSI_APB1_CPORT      (16)
 #define DEMO_DSI_APB2_CPORT      (16)
+#define DEMO_CSI_APB1_CPORT      (17)
+#define DEMO_CSI_APB3_CPORT      (17)
+#define DEMO_CSI_SPRING7_CPORT   (16)
 #define DEMO_VIBRATOR_APB1_CPORT (2)
 #define DEMO_VIBRATOR_APB2_CPORT (3)
 
@@ -101,6 +105,7 @@ static struct svc_interface_device_id devid[] = {
     { "gpb1", DEV_ID_GPB1 },
     { "gpb2", DEV_ID_GPB2 },
     { "spring6", DEV_ID_SPRING6 },
+    { "spring7", DEV_ID_SPRING7 },
 };
 
 /* Connections table */
@@ -161,6 +166,88 @@ static struct unipro_connection conn[] = {
         .cport_id0  = DEMO_DSI_APB1_CPORT,
         .device_id1 = DEV_ID_APB2,
         .cport_id1  = DEMO_DSI_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+#elif defined(CONFIG_SVC_ROUTE_APB1_APB2_APB3)
+    // APB1, CPort 0 <-> APB2, CPort 5, for GPIO
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_GPIO_APB1_CPORT,
+        .device_id1 = DEV_ID_APB2,
+        .cport_id1  = DEMO_GPIO_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+    // APB1, CPort 1 <-> APB2, CPort 4, for I2C
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_I2C_APB1_CPORT,
+        .device_id1 = DEV_ID_APB2,
+        .cport_id1  = DEMO_I2C_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+    // APB1, CPort 2 <-> APB2, CPort 3, for Vibrator
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_VIBRATOR_APB1_CPORT,
+        .device_id1 = DEV_ID_APB2,
+        .cport_id1  = DEMO_VIBRATOR_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+    // APB1, CPort 16 <-> APB2, CPort 16, for DSI
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_DSI_APB1_CPORT,
+        .device_id1 = DEV_ID_APB2,
+        .cport_id1  = DEMO_DSI_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+    // APB1, CPort 17 <-> APB3, CPort 17, for CSI
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_CSI_APB1_CPORT,
+        .device_id1 = DEV_ID_APB3,
+        .cport_id1  = DEMO_CSI_APB3_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+#elif defined(CONFIG_SVC_ROUTE_APB1_APB2_SPRING7)
+    // APB1, CPort 0 <-> APB2, CPort 5, for GPIO
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_GPIO_APB1_CPORT,
+        .device_id1 = DEV_ID_APB2,
+        .cport_id1  = DEMO_GPIO_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+    // APB1, CPort 1 <-> APB2, CPort 4, for I2C
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_I2C_APB1_CPORT,
+        .device_id1 = DEV_ID_APB2,
+        .cport_id1  = DEMO_I2C_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+    // APB1, CPort 2 <-> APB2, CPort 3, for Vibrator
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_VIBRATOR_APB1_CPORT,
+        .device_id1 = DEV_ID_APB2,
+        .cport_id1  = DEMO_VIBRATOR_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+    // APB1, CPort 16 <-> APB2, CPort 16, for DSI
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_DSI_APB1_CPORT,
+        .device_id1 = DEV_ID_APB2,
+        .cport_id1  = DEMO_DSI_APB2_CPORT,
+        .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
+    },
+    // APB1, CPort 17 <-> SPRING7, CPort 16, for CSI
+    {
+        .device_id0 = DEV_ID_APB1,
+        .cport_id0  = DEMO_CSI_APB1_CPORT,
+        .device_id1 = DEV_ID_SPRING7,
+        .cport_id1  = DEMO_CSI_SPRING7_CPORT,
         .flags      = CPORT_FLAGS_CSD_N | CPORT_FLAGS_CSV_N
     },
 #endif
