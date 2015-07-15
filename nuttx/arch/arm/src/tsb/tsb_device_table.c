@@ -37,6 +37,7 @@
 #include <nuttx/device_pwm.h>
 #include <nuttx/device_spi.h>
 #include <nuttx/device_uart.h>
+#include <nuttx/device_hid.h>
 #include <nuttx/usb.h>
 
 #include <arch/irq.h>
@@ -236,6 +237,15 @@ static struct device tsb_device_table[] = {
         .id             = 0,
         .resources      = tsb_uart_resources,
         .resource_count = ARRAY_SIZE(tsb_uart_resources),
+    },
+#endif
+
+#ifdef CONFIG_ARCH_CHIP_HID_DEVICE
+    {
+        .type           = DEVICE_TYPE_HID_HW,
+        .name           = "tsb_hid",
+        .desc           = "TSB HID Device Driver",
+        .id             = 0,
     },
 #endif
 };

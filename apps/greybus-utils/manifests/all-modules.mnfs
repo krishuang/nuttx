@@ -108,10 +108,16 @@ id = 10
 protocol = 0x0a
 
 ; SPI protocol on CPort 11
+;[cport-descriptor "11"]
+;bundle = 1
+;id = 11
+;protocol = 0x0b
+
+; HID protocol on CPort 11
 [cport-descriptor "11"]
 bundle = 1
 id = 11
-protocol = 0x0b
+protocol = 0x05
 
 ; DISPLAY (0x0c) automatically set up by SVC to use CPort 16
 
