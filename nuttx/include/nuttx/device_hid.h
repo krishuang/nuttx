@@ -1,5 +1,5 @@
-/**
- * Copyright (c) 2015 Google Inc.
+/*
+ * Copyright (c) 2015 Google, Inc.
  * All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
@@ -24,52 +24,56 @@
  * WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING NEGLIGENCE OR
  * OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS SOFTWARE, EVEN IF
  * ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
- *
- * @author Mark Greer
  */
 
+#ifndef __INCLUDE_NUTTX_DEVICE_HID_H
+#define __INCLUDE_NUTTX_DEVICE_HID_H
+
+#include <stdint.h>
+#include <stdbool.h>
+#include <assert.h>
+
+#include <nuttx/util.h>
 #include <nuttx/device.h>
 
-extern struct device_driver usb4624_driver;
-extern struct device_driver tsb_usb_hcd_driver;
-extern struct device_driver tsb_pll_driver;
-extern struct device_driver tsb_i2s_driver;
-extern struct device_driver tsb_pwm_driver;
-extern struct device_driver tsb_spi_driver;
-extern struct device_driver tsb_uart_driver;
-extern struct device_driver tsb_hid_driver;
+#define DEVICE_TYPE_HID_HW          "hid"
 
-void tsb_driver_register(void)
-{
-#ifdef CONFIG_ARA_BRIDGE_HAVE_USB4624
-    device_register_driver(&usb4624_driver);
-#endif
+/**
+ * HID Deivce Descriptor
+ */
+struct hid_descriptor {
+    uint8_t bLength;
+    uint16_t wReportDescLength;
+    uint16_t bcdHID;
+    uint16_t wProductID;
+    uint16_t wVendorID;
+    uint16_t wVersionID;
+    uint8_t bCountryCode;
+} __packed;
 
-#ifdef CONFIG_ARCH_CHIP_USB_HCD
-    device_register_driver(&tsb_usb_hcd_driver);
-#endif
+/**
+ * HID report descriptor
+ */
+struct hid_report_descriptor {
+    uint8_t report[0];
+};
 
-#ifdef CONFIG_ARCH_CHIP_TSB_PLL
-    device_register_driver(&tsb_pll_driver);
-#endif
+/**
+ * HID device driver operations
+ */
+struct device_hid_type_ops {
+    int (*power_on)(struct device *dev);
+    int (*power_off)(struct device *dev);
+    int (*get_descriptor)(struct device *dev, struct hid_descriptor *desc);
+    int (*get_report_descriptor)(struct device *dev,
+                                 struct hid_report_descriptor *desc);
+    int (*get_report)(struct device *dev, uint8_t report_type,
+                      uint8_t report_id, uint8_t *data, uint32_t len);
+    int (*set_report)(struct device *dev, uint8_t report_type,
+                      uint8_t report_id, uint8_t *data, uint32_t len);
+    int (*register_callback)(struct device *dev,
+                             int (*callback)(void *context));
+    int (*unregister_callback)(struct device *dev);
+};
 
-#ifdef CONFIG_ARCH_CHIP_TSB_I2S
-    device_register_driver(&tsb_i2s_driver);
-#endif
-
-#ifdef CONFIG_ARCH_CHIP_DEVICE_PWM
-    device_register_driver(&tsb_pwm_driver);
-#endif
-
-#ifdef CONFIG_ARCH_CHIP_DEVICE_SPI
-    device_register_driver(&tsb_spi_driver);
-#endif
-
-#ifdef CONFIG_ARCH_CHIP_DEVICE_UART
-    device_register_driver(&tsb_uart_driver);
-#endif
-
-#ifdef CONFIG_ARCH_CHIP_HID_DEVICE
-    device_register_driver(&tsb_hid_driver);
-#endif
-}
+#endif /* __INCLUDE_NUTTX_DEVICE_HID_H */
