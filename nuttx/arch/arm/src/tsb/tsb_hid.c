@@ -49,7 +49,8 @@ struct tsb_hid_info {
     struct device *dev;
 
     /** hid input event callback function */
-    int (*callback)(void *context);
+    int (*callback)(struct device *dev, uint8_t report_type, uint8_t *report,
+                    uint16_t len);
     /** Exclusive access for operation */
     sem_t lock;
 };
@@ -128,7 +129,7 @@ static int tsb_hid_get_report_desc(struct device *dev,
 }
 
 static int tsb_hid_get_report(struct device *dev, uint8_t report_type,
-                              uint8_t report_id, uint8_t *data, uint32_t len)
+                              uint8_t report_id, uint8_t *data, uint16_t len)
 {
     struct tsb_hid_info *info = NULL;
     int ret = 0;
@@ -147,7 +148,7 @@ static int tsb_hid_get_report(struct device *dev, uint8_t report_type,
 }
 
 static int tsb_hid_set_report(struct device *dev, uint8_t report_type,
-                              uint8_t report_id, uint8_t *data, uint32_t len)
+                              uint8_t report_id, uint8_t *data, uint16_t len)
 {
     struct tsb_hid_info *info = NULL;
     int ret = 0;
@@ -166,7 +167,7 @@ static int tsb_hid_set_report(struct device *dev, uint8_t report_type,
 }
 
 static int tsb_hid_register_callback(struct device *dev,
-                                     int (*callback)(void *context))
+                                     hid_event_callback callback)
 {
     struct tsb_hid_info *info = NULL;
     int ret = 0;
