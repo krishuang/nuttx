@@ -43,7 +43,6 @@
 #define GB_HID_VERSION_MAJOR 0
 #define GB_HID_VERSION_MINOR 1
 
-#define MULTIPLE_HID_DEVICE 1
 //#define WORKS_ON_DRIVER 1
 
 struct gb_hid_info {
@@ -65,47 +64,7 @@ struct gb_hid_info {
 
 static struct gb_hid_info *hid_info = NULL;
 
-#ifndef MULTIPLE_HID_DEVICE
-char ReportDescriptor[52] = {
-    0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
-    0x09, 0x02,                    // USAGE (Mouse)
-    0xa1, 0x01,                    // COLLECTION (Application)
-    0x09, 0x01,                    //   USAGE (Pointer)
-    0xa1, 0x00,                    //   COLLECTION (Physical)
-    0x85, 0x01,                    //   REPORT_ID (1)
-    0x05, 0x09,                    //     USAGE_PAGE (Button)
-    0x19, 0x01,                    //     USAGE_MINIMUM (Button 1)
-    0x29, 0x03,                    //     USAGE_MAXIMUM (Button 3)
-    0x15, 0x00,                    //     LOGICAL_MINIMUM (0)
-    0x25, 0x01,                    //     LOGICAL_MAXIMUM (1)
-    0x95, 0x03,                    //     REPORT_COUNT (3)
-    0x75, 0x01,                    //     REPORT_SIZE (1)
-    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-    0x95, 0x01,                    //     REPORT_COUNT (1)
-    0x75, 0x05,                    //     REPORT_SIZE (5)
-    0x81, 0x03,                    //     INPUT (Cnst,Var,Abs)
-    0x05, 0x01,                    //     USAGE_PAGE (Generic Desktop)
-    0x09, 0x30,                    //     USAGE (X)
-    0x09, 0x31,                    //     USAGE (Y)
-    0x15, 0x81,                    //     LOGICAL_MINIMUM (-127)
-    0x25, 0x7f,                    //     LOGICAL_MAXIMUM (127)
-    0x75, 0x08,                    //     REPORT_SIZE (8)
-    0x95, 0x02,                    //     REPORT_COUNT (2)
-    0x81, 0x06,                    //     INPUT (Data,Var,Rel)
-    0xc0,                          //   END_COLLECTION
-    0xc0                           // END_COLLECTION
-};
-
-struct gb_hid_desc_response fake_desc = {
-    0x0a,
-    0x34,
-    0x101,
-    0x0416,
-    0x192F,
-    0x00
-};
-#else
-char ReportDescriptor[117] = {
+char ReportDescriptor[130] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
     0x09, 0x06,                    // USAGE (Keyboard)
     0xa1, 0x01,                    // COLLECTION (Application)
@@ -164,29 +123,66 @@ char ReportDescriptor[117] = {
     0x75, 0x08,                    //     REPORT_SIZE (8)
     0x95, 0x02,                    //     REPORT_COUNT (2)
     0x81, 0x06,                    //     INPUT (Data,Var,Rel)
+    0x09, 0x01,                    //     USAGE (iName)
+    0x75, 0x08,                    //     REPORT_SIZE (8)
+    0x95, 0x01,                    //     REPORT_COUNT (1)
+    0x15, 0x00,                    //     LOGICAL_MINIMUM (0)
+    0x26, 0xff, 0x00,              //     LOGICAL_MAXIMUM (255)
+    0xb1, 0x03,                    //     FEATURE (Cnst,Var,Abs)
     0xc0,                          //   END_COLLECTION
     0xc0                           // END_COLLECTION
 };
 
 struct gb_hid_desc_response fake_desc = {
     0x0a,
-    0x75,
+    0x82,
     0x101,
     0x0416,
     0x192F,
     0x00
 };
 
-char fake_keyboard_indata [9] = {
+char fake_keyboard_data [9] = {
     0x01, 0x00, 0x00, 0x00,
     0x00, 0x00, 0x00, 0x00,
     0x00
 };
-#endif
 
-
-char fake_mouse_indata [4] = {
+char fake_mouse_data [4] = {
     0x01, 0x00, 0x00, 0x00
+};
+
+char fake_dev_feature_data [2] = {
+    0x02, 0x00
+};
+
+char fake_raw_feature_data [256] = {
+    0x00, 0x01, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x02, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x03, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x04, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x05, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x06, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x07, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x08, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x09, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x0a, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x0b, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x0c, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x0d, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x0e, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x0f, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x10, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x11, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x12, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x13, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x14, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x15, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x16, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x17, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x18, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x19, 0x02, 0x03, 0x04, 0x05, 0x06, 0x07, 0x08, 0x009,
+    0x00, 0x1a, 0x02, 0x03, 0x04, 0x05
 };
 
 /**
@@ -221,6 +217,8 @@ static uint8_t gb_hid_get_descriptor(struct gb_operation *operation)
     struct gb_hid_desc_response *response;
     //int ret = 0;
 
+    lldbg("%s()+\n", __func__);
+
     if (!hid_info || !hid_info->dev) {
         return GB_OP_UNKNOWN_ERROR;
     }
@@ -248,6 +246,7 @@ static uint8_t gb_hid_get_descriptor(struct gb_operation *operation)
 
     memcpy(&hid_info->hid_desc, response, response->length);
 
+    lldbg("%s()-\n", __func__);
     return GB_OP_SUCCESS;
 }
 
@@ -261,6 +260,8 @@ static uint8_t gb_hid_get_report_descriptor(struct gb_operation *operation)
 {
     char *response;
     //int ret =0;
+
+    lldbg("%s()+\n", __func__);
 
     response = gb_operation_alloc_response(operation,
                                            hid_info->hid_desc.report_desc_length
@@ -279,7 +280,7 @@ static uint8_t gb_hid_get_report_descriptor(struct gb_operation *operation)
     // Just retun fake data for verify whithout peripheral drievr
     memcpy(response, &ReportDescriptor, sizeof(ReportDescriptor));
 #endif
-
+    lldbg("%s()-\n", __func__);
     return GB_OP_SUCCESS;
 }
 
@@ -323,7 +324,11 @@ static uint8_t gb_hid_get_report(struct gb_operation *operation)
     uint16_t report_len;
 #endif
 
+    lldbg("%s()+\n", __func__);
+
     request = gb_operation_get_request_payload(operation);
+    lldbg("%s():report_type is %d\n", __func__, request->report_type);
+    lldbg("%s():report_id is %d\n", __func__, request->report_id);
 
 #ifdef WORKS_ON_DRIVER
     ret = device_hid_get_report_length(hid_info->dev, request->report_type,
@@ -334,6 +339,14 @@ static uint8_t gb_hid_get_report(struct gb_operation *operation)
 
     report_len = ret;
 
+    /**
+     * If the report ID is not '0', the report data will include extern one
+     * byte date for ID.
+     */
+    if (request->report_id > 0) {
+        report_len += 1;
+    }
+
     response = gb_operation_alloc_response(operation, report_len);
     if (!response) {
             return GB_OP_NO_MEMORY;
@@ -342,36 +355,48 @@ static uint8_t gb_hid_get_report(struct gb_operation *operation)
     ret = device_hid_get_report(hid_info->dev, request->report_type,
                                 request->report_id, response, report_len);
     if (ret) {
-        gb_info("%s(): %x error in ops\n", __func__, ret);
+        lldbg("%s(): %x error in ops\n", __func__, ret);
         return GB_OP_MALFUNCTION;
     }
 #else
     // Just retun fake data for verify whithout peripheral drievr
-#ifdef MULTIPLE_HID_DEVICE
-    if (request->report_id == 1) {
+    if (request->report_id == 1 && request->report_type == 0) {
+        // keyboard input report
         response = gb_operation_alloc_response(operation,
-                                               sizeof(fake_keyboard_indata));
+                                               sizeof(fake_keyboard_data));
         if (!response) {
             return GB_OP_NO_MEMORY;
         }
-        memcpy(response, &fake_keyboard_indata, sizeof(fake_keyboard_indata));
-    } else {
+        memcpy(response, &fake_keyboard_data, sizeof(fake_keyboard_data));
+    } else if (request->report_id == 2 && request->report_type == 0) {
+        // mouse input report
         response = gb_operation_alloc_response(operation,
-                                               sizeof(fake_mouse_indata));
+                                               sizeof(fake_mouse_data));
         if (!response) {
             return GB_OP_NO_MEMORY;
         }
+        memcpy(response, &fake_mouse_data, sizeof(fake_mouse_data));
+    } else if (request->report_id == 2 && request->report_type == 2) {
+        // mouse input report
+        response = gb_operation_alloc_response(operation,
+                                               sizeof(fake_dev_feature_data));
+        if (!response) {
+            return GB_OP_NO_MEMORY;
+        }
+        memcpy(response, &fake_dev_feature_data, sizeof(fake_dev_feature_data));
+    } else if (request->report_id == 9) {
+        // feature input report
+        response = gb_operation_alloc_response(operation,
+                                               sizeof(fake_raw_feature_data));
+        if (!response) {
+            return GB_OP_NO_MEMORY;
+        }
+        memcpy(response, &fake_raw_feature_data, sizeof(fake_raw_feature_data));
     }
-#else
-    response = gb_operation_alloc_response(operation,
-                                           sizeof(fake_mouse_indata));
-    if (!response) {
-        return GB_OP_NO_MEMORY;
-    }
-    memcpy(response, &fake_mouse_indata, sizeof(fake_mouse_indata));
-#endif //MULTIPLE_HID_DEVICE
+    else
+        return GB_OP_MALFUNCTION;
 #endif //WORKS_ON_DRIVER
-
+    lldbg("%s()-\n", __func__);
     return GB_OP_SUCCESS;
 }
 
@@ -383,6 +408,36 @@ static uint8_t gb_hid_get_report(struct gb_operation *operation)
  */
 static uint8_t gb_hid_set_report(struct gb_operation *operation)
 {
+    struct gb_hid_set_report_request *request;
+
+#ifdef WORKS_ON_DRIVER
+    int ret = 0;
+    uint16_t report_len;
+#endif
+
+    lldbg("%s()+\n", __func__);
+
+    request = gb_operation_get_request_payload(operation);
+    lldbg("%s():report_type is %d\n", __func__, request->report_type);
+    lldbg("%s():report_id is %d\n", __func__, request->report_id);
+
+#ifdef WORKS_ON_DRIVER
+    ret = device_hid_get_report_length(hid_info->dev, request->report_type,
+                                       request->report_id);
+    if (ret <= 0) {
+        return GB_OP_MALFUNCTION;
+    }
+
+    report_len = ret;
+
+    ret = device_hid_set_report(hid_info->dev, request->report_type,
+                                request->report_id, request->report,
+                                report_len);
+    if (ret) {
+        return GB_OP_MALFUNCTION;
+    }
+#endif
+    lldbg("%s()-\n", __func__);
     return GB_OP_SUCCESS;
 }
 
