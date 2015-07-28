@@ -80,6 +80,7 @@ struct device_hid_type_ops {
                                  struct hid_report_descriptor *desc);
     int (*get_report_length)(struct device *dev, uint8_t report_type,
                              uint8_t report_id);
+    int (*get_maximum_report_length)(struct device *dev, uint8_t report_type);
     int (*get_report)(struct device *dev, uint8_t report_type,
                       uint8_t report_id, uint8_t *data, uint16_t len);
     int (*set_report)(struct device *dev, uint8_t report_type,
@@ -156,8 +157,27 @@ static inline int device_hid_get_report_length(struct device *dev,
                                                              report_id);
 }
 
+static inline int device_hid_get_max_report_length(struct device *dev,
+                                                   uint8_t report_type)
+{
+    DEBUGASSERT(dev && dev->driver && dev->driver->ops &&
+                dev->driver->ops->type_ops.hid);
+
+    if (dev->state != DEVICE_STATE_OPEN) {
+        return -ENODEV;
+    }
+
+    if (!dev->driver->ops->type_ops.hid->get_maximum_report_length) {
+        return -ENOSYS;
+    }
+
+    return dev->driver->ops->type_ops.hid->get_maximum_report_length(dev,
+                                                             HID_INPUT_REPORT);
+}
+
 static inline int device_hid_get_report_descriptor(struct device *dev,
-                                                   struct hid_report_descriptor *desc)
+                                                   struct hid_report_descriptor
+                                                   *desc)
 {
     DEBUGASSERT(dev && dev->driver && dev->driver->ops &&
                 dev->driver->ops->type_ops.hid);
