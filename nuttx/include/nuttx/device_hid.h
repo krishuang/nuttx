@@ -57,13 +57,6 @@ struct hid_descriptor {
 } __packed;
 
 /**
- * HID report descriptor
- */
-struct hid_report_descriptor {
-    uint8_t desc[0];
-};
-
-/**
  * HID event callback function
  */
 typedef int (*hid_event_callback)(struct device *dev, uint8_t report_type,
@@ -76,8 +69,7 @@ struct device_hid_type_ops {
     int (*power_on)(struct device *dev);
     int (*power_off)(struct device *dev);
     int (*get_descriptor)(struct device *dev, struct hid_descriptor *desc);
-    int (*get_report_descriptor)(struct device *dev,
-                                 struct hid_report_descriptor *desc);
+    int (*get_report_descriptor)(struct device *dev, uint8_t *desc);
     int (*get_report_length)(struct device *dev, uint8_t report_type,
                              uint8_t report_id);
     int (*get_maximum_report_length)(struct device *dev, uint8_t report_type);
@@ -121,8 +113,7 @@ static inline int device_hid_power_off(struct device *dev)
     return dev->driver->ops->type_ops.hid->power_off(dev);
 }
 
-static inline int device_hid_get_descriptor(struct device *dev,
-                                            struct hid_descriptor *desc)
+static inline int device_hid_get_descriptor(struct device *dev, struct hid_descriptor *desc)
 {
     DEBUGASSERT(dev && dev->driver && dev->driver->ops &&
                 dev->driver->ops->type_ops.hid);
@@ -176,8 +167,7 @@ static inline int device_hid_get_max_report_length(struct device *dev,
 }
 
 static inline int device_hid_get_report_descriptor(struct device *dev,
-                                                   struct hid_report_descriptor
-                                                   *desc)
+                                                   uint8_t *desc)
 {
     DEBUGASSERT(dev && dev->driver && dev->driver->ops &&
                 dev->driver->ops->type_ops.hid);
