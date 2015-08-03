@@ -53,52 +53,54 @@
  */
 struct op_node {
     /** queue entry */
-    sq_entry_t          entry;
+    sq_entry_t entry;
+
     /** pointer to operation */
     struct gb_operation *operation;
+
     /** pointer to buffer of request in operation */
-    uint8_t             *buffer;
+    uint8_t  *buffer;
 };
 
 struct gb_hid_info {
     /** assigned CPort number */
-    uint16_t        cport;
+    uint16_t cport;
 
     /** opened device driver handler */
-    struct device   *dev;
+    struct device *dev;
 
     /** device descriptor for this device */
     struct gb_hid_desc_response hid_desc;
 
     /** device type for this device */
-    char            *dev_type;
+    char *dev_type;
 
     /** Id for device in device table */
-    uint16_t        dev_id;
+    uint16_t dev_id;
 
     /** available operation queue */
-    sq_queue_t          free_queue;
+    sq_queue_t free_queue;
 
     /** received data operation queue */
-    sq_queue_t          data_queue;
+    sq_queue_t data_queue;
 
     /** operation node in receiving */
-    struct op_node      *rx_node;
+    struct op_node *rx_node;
 
     /** buffer size in operation */
-    int                 rx_buf_size;
+    int rx_buf_size;
 
     /** amount of operations */
-    int                 entries;
+    int entries;
 
     /** semaphore for notifying data received */
-    sem_t               rx_sem;
+    sem_t rx_sem;
 
     /** receiving data process threed */
-    pthread_t           rx_thread;
+    pthread_t rx_thread;
 
     /** inform the thread should be terminated */
-    int                 thread_stop;
+    int thread_stop;
 };
 
 static struct gb_hid_info *hid_info = NULL;
@@ -174,8 +176,6 @@ static uint8_t gb_hid_get_descriptor(struct gb_operation *operation)
     struct hid_descriptor hid_desc;
     int ret = 0;
 
-    lldbg("()+\n");
-
     if (!hid_info || !hid_info->dev) {
         return GB_OP_UNKNOWN_ERROR;
     }
@@ -200,7 +200,7 @@ static uint8_t gb_hid_get_descriptor(struct gb_operation *operation)
 
     memcpy(&hid_info->hid_desc, &hid_desc,
            sizeof(struct gb_hid_desc_response));
-    lldbg("()-\n");
+
     return GB_OP_SUCCESS;
 }
 
@@ -215,13 +215,10 @@ static uint8_t gb_hid_get_report_descriptor(struct gb_operation *operation)
     uint8_t *response;
     int ret = 0;
 
-    lldbg("()+\n");
-
     if (!hid_info || !hid_info->dev) {
         return GB_OP_UNKNOWN_ERROR;
     }
 
-    lldbg("report_desc_length = %u\n", hid_info->hid_desc.report_desc_length);
     response = gb_operation_alloc_response(operation,
                                         hid_info->hid_desc.report_desc_length);
     if (!response) {
@@ -234,7 +231,6 @@ static uint8_t gb_hid_get_report_descriptor(struct gb_operation *operation)
         return GB_OP_MALFUNCTION;
     }
 
-    lldbg("()-\n");
     return GB_OP_SUCCESS;
 }
 
@@ -248,7 +244,6 @@ static uint8_t gb_hid_power_on(struct gb_operation *operation)
 {
     int ret = 0;
 
-    lldbg("()+\n");
     if (!hid_info || !hid_info->dev) {
         return GB_OP_UNKNOWN_ERROR;
     }
@@ -258,7 +253,7 @@ static uint8_t gb_hid_power_on(struct gb_operation *operation)
         gb_info("%s(): %x error in ops\n", __func__, ret);
         return GB_OP_MALFUNCTION;
     }
-    lldbg("()-\n");
+
     return GB_OP_SUCCESS;
 }
 
@@ -271,7 +266,7 @@ static uint8_t gb_hid_power_on(struct gb_operation *operation)
 static uint8_t gb_hid_power_off(struct gb_operation *operation)
 {
     int ret = 0;
-    lldbg("()+\n");
+
     if (!hid_info || !hid_info->dev) {
         return GB_OP_UNKNOWN_ERROR;
     }
@@ -281,7 +276,7 @@ static uint8_t gb_hid_power_off(struct gb_operation *operation)
         gb_info("%s(): %x error in ops\n", __func__, ret);
         return GB_OP_MALFUNCTION;
     }
-    lldbg("()-\n");
+
     return GB_OP_SUCCESS;
 }
 
@@ -298,11 +293,7 @@ static uint8_t gb_hid_get_report(struct gb_operation *operation)
     uint16_t report_len;
     int ret = 0;
 
-    lldbg("()+\n");
-
     request = gb_operation_get_request_payload(operation);
-    lldbg("%s():report_type is %d\n", __func__, request->report_type);
-    lldbg("%s():report_id is %d\n", __func__, request->report_id);
 
     ret = device_hid_get_report_length(hid_info->dev, request->report_type,
                                        request->report_id);
@@ -333,7 +324,6 @@ static uint8_t gb_hid_get_report(struct gb_operation *operation)
         return GB_OP_MALFUNCTION;
     }
 
-    lldbg("()-\n");
     return GB_OP_SUCCESS;
 }
 
@@ -349,11 +339,7 @@ static uint8_t gb_hid_set_report(struct gb_operation *operation)
     uint16_t report_len;
     int ret = 0;
 
-    lldbg("()+\n");
-
     request = gb_operation_get_request_payload(operation);
-    lldbg("%s():report_type is %d\n", __func__, request->report_type);
-    lldbg("%s():report_id is %d\n", __func__, request->report_id);
 
     ret = device_hid_get_report_length(hid_info->dev, request->report_type,
                                        request->report_id);
@@ -370,7 +356,6 @@ static uint8_t gb_hid_set_report(struct gb_operation *operation)
         return GB_OP_MALFUNCTION;
     }
 
-    lldbg("()-\n");
     return GB_OP_SUCCESS;
 }
 
@@ -391,7 +376,6 @@ static int hid_event_callback_routine(struct device *dev, uint8_t report_type,
                                       uint8_t *report, uint16_t len)
 {
     struct op_node *node;
-    lldbg("()+\n");
 
     memcpy(hid_info->rx_node->buffer, report, len);
     put_node_back(&hid_info->data_queue, hid_info->rx_node);
@@ -404,7 +388,7 @@ static int hid_event_callback_routine(struct device *dev, uint8_t report_type,
     hid_info->rx_node = node;
 
     sem_post(&hid_info->rx_sem);
-    lldbg("()-\n");
+
     return 0;
 }
 
@@ -438,7 +422,6 @@ static void *hid_rx_thread(void *data)
                 gb_debug("%s: IRQ Event operation failed (%x)!\n", __FUNC__,
                          ret);
             }
-            lldbg("%s()Sent oprtation out!!!!\n");
             put_node_back(&hid_info->free_queue, node);
         }
     }
