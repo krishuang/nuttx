@@ -112,21 +112,21 @@ struct tsb_hid_info {
     /** wait queue for power on/off event*/
     struct hid_waitq wq;
 
-    /** HID mouse test data index value */
+    /** HID keyboard test data index value */
     int data_idx;
-    /** HID mouse test data size */
+    /** HID keyboard test data size */
     int data_num;
-    /** HID mouse test data report rate (unit: microsecond) */
+    /** HID keyboard test data report rate (unit: microsecond) */
     int rate;
 };
 
 #define VENDORID                0x18D1
 #define PRODUCTID               0x1234
 
-#define HID_REPORT_DESC_LEN     52
+#define HID_REPORT_DESC_LEN     35
 
 /**
- * Mouse HID Device Descriptor
+ * Keyboard HID Device Descriptor
  */
 struct hid_descriptor hid_dev_desc = {
     0x0A,
@@ -139,12 +139,10 @@ struct hid_descriptor hid_dev_desc = {
 
 // Input report - 4 bytes
 //
-// Byte |  D7    D6      D5      D4      D3      D2      D1      D0
-// -----+---------------------------------------------------------------------
-//  0   |  0     0       0     Extra    Side   Middle   Right   Left (Buttons)
-//  1   |                             X (REL)
-//  2   |                             Y (REL)
-//  3   |                       Vertical Wheel (REL)
+// Byte |  D7    D6    D5    D4     D3        D2        D1      D0
+// -----+-------------------------------------------------------------------
+//  0   |  0     0     0   KANA  Compose  ScrollLock CapsLock NumLock
+//  1   |                         Keycode
 //
 // Output report - n/a
 //
@@ -152,106 +150,75 @@ struct hid_descriptor hid_dev_desc = {
 //
 
 /**
- * Mouse HID report descriptor
+ * Keyboard HID report descriptor
  */
 uint8_t hid_report_desc[HID_REPORT_DESC_LEN] = {
     0x05, 0x01,                    // USAGE_PAGE (Generic Desktop)
-    0x09, 0x02,                    // USAGE (Mouse)
+    0x09, 0x06,                    // USAGE (Keyboard)
     0xa1, 0x01,                    // COLLECTION (Application)
-    0x09, 0x01,                    //   USAGE (Pointer)
-    0xa1, 0x00,                    //   COLLECTION (Physical)
-    0x05, 0x09,                    //     USAGE_PAGE (Button)
-    0x19, 0x01,                    //     USAGE_MINIMUM (Button 1)
-    0x29, 0x05,                    //     USAGE_MAXIMUM (Button 5)
-    0x15, 0x00,                    //     LOGICAL_MINIMUM (0)
-    0x25, 0x01,                    //     LOGICAL_MAXIMUM (1)
-    0x75, 0x01,                    //     REPORT_SIZE (1)
-    0x95, 0x05,                    //     REPORT_COUNT (5)
-    0x81, 0x02,                    //     INPUT (Data,Var,Abs)
-    0x75, 0x03,                    //     REPORT_SIZE (3)
-    0x95, 0x01,                    //     REPORT_COUNT (1)
-    0x81, 0x01,                    //     INPUT (Cnst,Ary,Abs)
-    0x05, 0x01,                    //     USAGE_PAGE (Generic Desktop)
-    0x09, 0x30,                    //     USAGE (X)
-    0x09, 0x31,                    //     USAGE (Y)
-    0x09, 0x38,                    //     USAGE (Wheel)
-    0x15, 0x81,                    //     LOGICAL_MINIMUM (-127)
-    0x25, 0x7F,                    //     LOGICAL_MAXIMUM (127)
-    0x75, 0x08,                    //     REPORT_SIZE (8)
-    0x95, 0x03,                    //     REPORT_COUNT (3)
-    0x81, 0x06,                    //     INPUT (Data,Var,Rel)
-    0xC0,                          //   END_COLLECTION
-    0xC0                           // END_COLLECTION
+    0x05, 0x07,                    //   USAGE_PAGE (Keyboard)
+    0x19, 0xe0,                    //   USAGE_MINIMUM (Keyboard LeftControl)
+    0x29, 0xe7,                    //   USAGE_MAXIMUM (Keyboard Right GUI)
+    0x15, 0x00,                    //   LOGICAL_MINIMUM (0)
+    0x25, 0x01,                    //   LOGICAL_MAXIMUM (1)
+    0x75, 0x01,                    //   REPORT_SIZE (1)
+    0x95, 0x08,                    //   REPORT_COUNT (8)
+    0x81, 0x02,                    //   INPUT (Data,Var,Abs)
+    0x95, 0x01,                    //   REPORT_COUNT (1)
+    0x75, 0x08,                    //   REPORT_SIZE (8)
+    0x25, 0x65,                    //   LOGICAL_MAXIMUM (101)
+    0x19, 0x00,                    //   USAGE_MINIMUM (Reserved (no event indicated))
+    0x29, 0x65,                    //   USAGE_MAXIMUM (Keyboard Application)
+    0x81, 0x00,                    //   INPUT (Data,Ary,Abs)
+    0xc0                           // END_COLLECTION
 };
 
 /**
- * mouse report data
+ * Keyboard report data
  */
-struct hid_mouse_data {
-    /** mouse button, bit[0-4] : button0 - button4 */
-    uint8_t button;
-    /** mouse x axis, range(-127:127) */
-    uint8_t x;
-    /** mouse y axis, range(-127:127) */
-    uint8_t y;
-    /** Wheel, range(-127:127) */
-    uint8_t wheel;
+struct hid_kbd_data {
+    /** modifier
+     *  bit[0-4] : Num Lock, Caps Lock, Scroll Lock, Compose, KANA
+     */
+    uint8_t modifier;
+    /** keycode, 101 Keys  */
+    uint8_t keycode;
 } __packed;
 
 /**
- * report length of each HID Reports in HID Mouse Report Descriptor
+ * report length of each HID Reports in HID Report Descriptor
  */
 struct hid_size_info hid_sizeinfo[] =
 {
-    { 0, { 4, 0, 0 } }, /* parsed from HID Report Descriptor manually */
+    { 0, { 2, 0, 0 } }, /* parsed from HID Report Descriptor manually */
 };
 
 /**
- * HID Mouse test data
+ * HID keyboard test data
  */
-struct hid_mouse_data testdata[24] =
+struct hid_kbd_data testdata[] =
 {
-    {0x01, 0x00, 0x00, 0x00},   /* Button0 on */
-    {0x00, 0x00, 0x00, 0x00},   /* Button0 off */
-    {0x00, 0x02, 0x00, 0x00},   /* X + 2 */
-    {0x00, 0x02, 0x00, 0x00},   /* X + 2 */
-    {0x00, 0x02, 0x00, 0x00},   /* X + 2 */
-    {0x00, 0x02, 0x00, 0x00},   /* X + 2 */
-    {0x00, 0x00, 0x00, 0x01},   /* Wheel + 1 */
-    {0x00, 0x00, 0x00, 0x00},   /* Wheel + 0 */
-    {0x00, 0x00, 0x02, 0x00},   /* Y + 2 */
-    {0x00, 0x00, 0x02, 0x00},   /* Y + 2 */
-    {0x00, 0x00, 0x02, 0x00},   /* Y + 2 */
-    {0x00, 0x00, 0x02, 0x00},   /* Y + 2 */
-    {0x00, 0x00, 0x00, 0xFF},   /* Wheel - 1 */
-    {0x00, 0x00, 0x00, 0x00},   /* Wheel - 0 */
-    {0x00, 0xFE, 0x00, 0x00},   /* X - 2 */
-    {0x00, 0xFE, 0x00, 0x00},   /* X - 2 */
-    {0x00, 0xFE, 0x00, 0x00},   /* X - 2 */
-    {0x00, 0xFE, 0x00, 0x00},   /* X - 2 */
-    {0x02, 0x00, 0x00, 0x00},   /* Button1 on */
-    {0x00, 0x00, 0x00, 0x00},   /* Button1 off */
-    {0x00, 0x00, 0xFE, 0x00},   /* Y - 2 */
-    {0x00, 0x00, 0xFE, 0x00},   /* Y - 2 */
-    {0x00, 0x00, 0xFE, 0x00},   /* Y - 2 */
-    {0x00, 0x00, 0xFE, 0x00}    /* Y - 2 */
+    {0x00, 0x04},   /* key a press*/
+    {0x00, 0x00},   /* key release */
+    {0x02, 0x05},   /* Key shift + b press */
+    {0x00, 0x00},   /* Key release */
 };
 
 /**
- * @brief Get HID mouse hardware data
+ * @brief Get HID keyboard hardware data
  *
- * Because driver doesn't connect to real mouse hardware, so just reports some
- * fake mouse data to upper layer.
+ * Because driver doesn't connect to real keyboard hardware, so just reports
+ * some fake keyboard data to upper layer.
  *
  * @param info pointer to structure of private HID data
  * @param data output data buffer
  * @return 0 on success, negative errno on error
  */
-static int get_mouse_data(struct tsb_hid_info *info, struct hid_mouse_data *mouse)
+static int get_kbd_data(struct tsb_hid_info *info, struct hid_kbd_data *kbd)
 {
     sem_wait(&info->data);
-    /* get mouse report data from testdata array*/
-    memcpy(mouse, &testdata[info->data_idx], sizeof(struct hid_mouse_data));
+    /* get keyboard report data from testdata array*/
+    memcpy(kbd, &testdata[info->data_idx], sizeof(struct hid_kbd_data));
     info->data_idx = (info->data_idx + 1) % info->data_num;
     sem_post(&info->data);
     return 0;
@@ -275,10 +242,10 @@ static int get_input_report(struct device *dev, uint8_t report_id,
 
     if (rptlen) {
         if (!report_id) {
-            if (len < sizeof(struct hid_mouse_data)) {
+            if (len < sizeof(struct hid_kbd_data)) {
                 return -EINVAL;
             }
-            ret = get_mouse_data(dev->private, (struct hid_mouse_data*)data);
+            ret = get_kbd_data(dev->private, (struct hid_kbd_data*)data);
         } else {
             /* For current test case, we don't support multiple Report ID
              * structure, so just returns error code */
@@ -376,7 +343,7 @@ static int set_feature_report(struct device *dev, uint8_t report_id,
 }
 
 /**
- * @brief HID mouse thread function
+ * @brief HID device thread function
  *
  * @param context pointer to structure of device data
  */
@@ -384,7 +351,7 @@ void tsb_hid_thread_func(void *context)
 {
     struct device *dev = context;
     struct tsb_hid_info *info = NULL;
-    struct hid_mouse_data mouse;
+    struct hid_kbd_data kbd;
 
     /* check input parameters */
     if (!dev || !dev->private) {
@@ -406,14 +373,14 @@ void tsb_hid_thread_func(void *context)
         }
 
         /* get input report data and send to upper layer */
-        get_input_report(dev, 0, (uint8_t*)&mouse,
-                         sizeof(struct hid_mouse_data));
+        get_input_report(dev, 0, (uint8_t*)&kbd,
+                         sizeof(struct hid_kbd_data));
 
         if (info->event_callback) {
             /* for current test case, only supports single report structure */
             if (!info->multisupp) {
-                info->event_callback(dev, HID_INPUT_REPORT, (uint8_t*)&mouse,
-                                     sizeof(struct hid_mouse_data));
+                info->event_callback(dev, HID_INPUT_REPORT, (uint8_t*)&kbd,
+                                     sizeof(struct hid_kbd_data));
             }
         }
         usleep(info->rate);
@@ -816,7 +783,7 @@ static int tsb_hid_dev_open(struct device *dev)
     info->event_callback = NULL;
     info->state = HID_DEVICE_FLAG_OPEN;
 
-    /* set mouse default value */
+    /* set device default value */
     info->data_idx = 0;
     info->data_num = ARRAY_SIZE(testdata);
     info->rate = 1000; /* 1ms */
@@ -825,7 +792,7 @@ static int tsb_hid_dev_open(struct device *dev)
     pthread_mutex_init(&info->wq.mutex, NULL);
     pthread_cond_init(&info->wq.cond, NULL);
 
-    /* create thread to receive HID mouse data */
+    /* create thread to receive HID device data */
     if (pthread_create(&info->hid_thread, NULL, (void*)tsb_hid_thread_func,
                        (void*)dev) != 0) {
         ret = -EIO;
