@@ -109,3 +109,7 @@ endif
 ifeq ($(CONFIG_ARCH_CHIP_DEVICE_UART), y)
 CHIP_CSRCS += tsb_uart.c
 endif
+
+ifeq ($(CONFIG_ARCH_CHIP_DEVICE_HID), y)
+CHIP_CSRCS += tsb_hid.c
+endif
